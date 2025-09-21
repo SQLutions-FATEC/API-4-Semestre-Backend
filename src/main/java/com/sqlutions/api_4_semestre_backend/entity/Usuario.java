@@ -1,5 +1,6 @@
 package com.sqlutions.api_4_semestre_backend.entity;
 
+import jakarta.persistence.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,14 +17,18 @@ public class Usuario {
     @Column(name = "usr_id")
     private Long id;
 
-    @Column(name = "usr_nome")
+    @Column(nullable = false, name = "usr_nome")
     private String nome;
 
-    @Column(name = "usr_email")
+    @Column(nullable = false, unique = true, name = "usr_email")
     private String email;
 
-    @Column(name = "usr_senha")
+    @Column(nullable = false, name = "usr_senha")
     private String senha;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role funcao;
 
     public Long getId() {
         return id;
@@ -55,6 +60,14 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Role getFuncao() {
+        return funcao;
+    }
+
+    public void setFuncao(Role funcao) {
+        this.funcao = funcao;
     }
 
 }
