@@ -1,5 +1,7 @@
 package com.sqlutions.api_4_semestre_backend.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -13,14 +15,15 @@ public class Radar {
     @Column(name = "Id")
     private String id;
 
-    @Column(name = "id_end")
-    private Integer adress;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_end")
+    private Address address;
 
     @Column(name = "latitude")
-    private Long latitude;
+    private BigDecimal latitude;
     
     @Column(name = "longitude")
-    private Long longitude;
+    private BigDecimal longitude;
 
     @Column(name = "vel_reg")
     private Integer speed;
@@ -33,27 +36,27 @@ public class Radar {
         this.id = id;
     }
 
-    public Integer getAdress() {
-        return adress;
+     public Address getAddress() {
+        return address;
     }
 
-    public void setAdress(Integer adress) {
-        this.adress = adress;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
-    public Long getLatitude() {
+    public BigDecimal getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Long latitude) {
+    public void setLatitude(BigDecimal latitude) {
         this.latitude = latitude;
     }
 
-    public Long getLongitude() {
+    public BifDecimal getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Long longitude) {
+    public void setLongitude(BiGDecimal longitude) {
         this.longitude = longitude;
     }
 
