@@ -1,0 +1,57 @@
+package com.sqlutions.api_4_semestre_backend.service.impl;
+
+import com.sqlutions.api_4_semestre_backend.entity.Radar;
+import com.sqlutions.api_4_semestre_backend.repository.RadarRepository;
+import com.sqlutions.api_4_semestre_backend.service.RadarService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class RadarServiceImpl implements RadarService {
+
+    private final RadarRepository radarRepository;
+
+    public RadarServiceImpl(RadarRepository radarRepository) {
+        this.radarRepository = radarRepository;
+    }
+
+    @Override
+    public Radar createRadar(Radar radar) {
+        return radarRepository.save(radar);
+    }
+
+    @Override
+    public List<Radar> getAllRadars() {
+        return radarRepository.findAll();
+    }
+
+    @Override
+    public Optional<Radar> getRadarById(String id) {
+        return radarRepository.findById(id);
+    }
+
+    @Override
+    public Radar updateRadar(String id, Radar radar) {
+        return radarRepository.findById(id)
+                .map(existing -> {
+                    existing.setAddress(radar.getAddress());
+                    existing.setLatitude(radar.getLatitude());
+                    existing.setLongitude(radar.getLongitude());
+                    existing.setSpeed(radar.getSpeed());
+                    return radarRepository.save(existing);
+                })
+                .orElseThrow(() -> new RuntimeException("Radar not found"));
+    }
+
+    @Override
+    public void deleteRadar(String id) {
+        radarRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Radar> getRadarsByAddress(Long addressId) {
+        return radarRepository.findByAddressId(addressId);
+    }
+}
