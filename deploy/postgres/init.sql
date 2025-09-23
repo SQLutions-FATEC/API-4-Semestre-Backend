@@ -12,7 +12,9 @@ CREATE TYPE tipo_veiculo AS ENUM (
 -- Endereço
 CREATE TABLE endereco (
     id SERIAL PRIMARY KEY,
-    ende VARCHAR(150) NOT NULL UNIQUE
+    ende VARCHAR(150) NOT NULL UNIQUE,
+    bairro VARCHAR(50),
+    regiao VARCHAR(30)
 );
 
 -- Radar
