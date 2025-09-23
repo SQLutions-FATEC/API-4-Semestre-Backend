@@ -46,8 +46,3 @@ services:
 
 volumes:
   pgdata:
-
-environment:
-  - POSTGRES_USER=sqlutions
-  - POSTGRES_PASSWORD=api
-  - POSTGRES_DB=api
