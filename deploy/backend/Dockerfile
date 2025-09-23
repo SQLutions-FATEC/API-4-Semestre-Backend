@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y git && \
 # Buildar a aplicação
 RUN ./mvnw package -DskipTests
 
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 # Executar apenas o compilado .jar
 COPY --from=build /app/target/*.jar app.jar
