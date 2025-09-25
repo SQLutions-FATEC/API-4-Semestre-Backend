@@ -16,7 +16,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user, User saveUser) {
-        if (user.getRole() == Role.GESTOR && (saveUser == null || saveUser.getRole() != Role.ADMINISTRADOR)) {
+        if (user.getRole() == Role.Gestor && (saveUser == null || saveUser.getRole() != Role.Admin)) {
             throw new RuntimeException("Somente administradores podem criar e gerenciar conta de gestores.");
         }
         return userRepository.save(user);
