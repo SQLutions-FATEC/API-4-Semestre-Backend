@@ -14,20 +14,20 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "usr_id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, name = "usr_name")
+    @Column(nullable = false, name = "nome")
     private String name;
 
-    @Column(nullable = false, unique = true, name = "usr_email")
+    @Column(nullable = false, unique = true, name = "email")
     private String email;
 
-    @Column(nullable = false, name = "usr_password")
+    @Column(nullable = false, name = "senha")
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "usr_role")
+    @Column(nullable = false, name = "nivel")
     private Role role;
 
     public Long getId() {
