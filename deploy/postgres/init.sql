@@ -9,6 +9,11 @@ CREATE TYPE tipo_veiculo AS ENUM (
     'Indefinido'
 );
 
+CREATE TYPE nivel_usuario AS ENUM (
+    'Admin',
+    'Gestor'
+)
+
 -- Endereço
 CREATE TABLE endereco (
     id SERIAL PRIMARY KEY,
@@ -42,5 +47,6 @@ CREATE TABLE usuario (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    senha VARCHAR(100) NOT NULL
+    senha VARCHAR(100) NOT NULL,
+    nivel nivel_usuario NOT NULL
 );
