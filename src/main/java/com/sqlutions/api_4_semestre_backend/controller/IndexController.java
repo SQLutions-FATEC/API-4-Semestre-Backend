@@ -29,14 +29,14 @@ public class IndexController {
 
     @GetMapping("/radar")
     public Index getRadarIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody Radar[] radars,
-            @RequestBody(required = false) java.time.LocalDateTime timestamp) {
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         return indexService.getRadarIndexes(minutes, radars,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
 
     @GetMapping("/region")
     public Index getRegionIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody String region,
-            @RequestBody(required = false) java.time.LocalDateTime timestamp) {
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         return indexService.getRegionIndexes(minutes, region,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
