@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "leitura")
-public class Leitura {
+public class Reading {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -23,13 +23,13 @@ public class Leitura {
     private Radar radar;
 
     @Column(name = "dat_hora")
-    private java.time.LocalDate dataHora;
+    private java.time.LocalDate date;
 
     @Column(name = "tip_vei")
-    private String tipoVeiculo; // TODO: investigar se há conflito com o Enum do psql depois.
+    private String vehicleType; // TODO: investigar se há conflito com o Enum do psql depois.
 
     @Column(name = "vel")
-    private Integer velocidade;
+    private Integer speed;
 
     public Long getId() {
         return id;
@@ -47,27 +47,27 @@ public class Leitura {
         this.radar = radar;
     }
 
-    public java.time.LocalDate getDataHora() {
-        return dataHora;
+    public java.time.LocalDate getDate() {
+        return date;
     }
 
-    public void setDataHora(java.time.LocalDate dataHora) {
-        this.dataHora = dataHora;
+    public void setDate(java.time.LocalDate date) {
+        this.date = date;
     }
 
-    public String getTipoVeiculo() {
-        return tipoVeiculo;
+    public String getVehicleType() {
+        return vehicleType;
     }
 
-    public void setTipoVeiculo(String tipoVeiculo) {
-        this.tipoVeiculo = tipoVeiculo;
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType;
     }
 
-    public Integer getVelocidade() {
-        return velocidade;
+    public Integer getSpeed() {
+        return speed;
     }
 
-    public void setVelocidade(Integer velocidade) {
-        this.velocidade = velocidade;
+    public void setSpeed(Integer speed) {
+        this.speed = speed;
     }
 }

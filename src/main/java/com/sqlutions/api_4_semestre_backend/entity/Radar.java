@@ -21,7 +21,7 @@ public class Radar {
 
     @ManyToOne
     @JoinColumn(name = "id_end")
-    private Endereco endereco;
+    private Address address;
 
     @Column(name = "latitude", precision = 9, scale = 6)
     private BigDecimal latitude;
@@ -30,7 +30,7 @@ public class Radar {
     private BigDecimal longitude;
 
     @Column(name = "vel_reg")
-    private Integer velocidadeRegulamentada;
+    private Integer regulatedSpeed;
 
     public Long getId() {
         return id;
@@ -40,12 +40,12 @@ public class Radar {
         this.id = id;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public BigDecimal getLatitude() {
@@ -64,12 +64,12 @@ public class Radar {
         this.longitude = longitude;
     }
 
-    public Integer getVelocidadeRegulamentada() {
-        return velocidadeRegulamentada;
+    public Integer getRegulatedSpeed() {
+        return regulatedSpeed;
     }
 
-    public void setVelocidadeRegulamentada(Integer velocidadeRegulamentada) {
-        this.velocidadeRegulamentada = velocidadeRegulamentada;
+    public void setRegulatedSpeed(Integer regulatedSpeed) {
+        this.regulatedSpeed = regulatedSpeed;
     }
 
     
