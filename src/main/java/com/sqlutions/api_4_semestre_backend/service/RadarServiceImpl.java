@@ -27,28 +27,36 @@ public class RadarServiceImpl implements RadarService {
 
     @Override
     public Radar getRadarById(String id) {
-        return radarRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Radar with id " + id + " not found"));
+        return radarRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Radar with id " + id + " not found"));
     }
 
     @Override
     public Radar createRadar(Radar radar) {
         Long addressId = radar.getAddress().getId();
+        if (radar.getRegulatedSpeed() == null || radar.getRegulatedSpeed() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Regulated speed must be greater than 0");
+        } else if (radar.getLatitude() == null || radar.getLongitude() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Latitude and Longitude must be provided");
+        } else if (addressId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Address must be provided");
+        }
         Address address = addressRepository.findById(addressId).orElse(null);
         if (address == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Address with id " + addressId + " not found");
-        } else {
-            radar.setAddress(address);
         }
+        radar.setAddress(address);
         return radarRepository.save(radar);
     }
 
     @Override
     public Radar updateRadar(Radar radar) {
         Long addressId = radar.getAddress().getId();
-        Address address = addressRepository.findById(addressId).orElse(null);
-        if (address == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Address with id " + addressId + " not found");
-        } else {
+        if (addressId != null) {
+            Address address = addressRepository.findById(addressId).orElse(null);
+            if (address == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Address with id " + addressId + " not found");
+            }
             radar.setAddress(address);
         }
         return radarRepository.save(radar);
