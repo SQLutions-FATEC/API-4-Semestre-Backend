@@ -18,8 +18,6 @@ CREATE TYPE nivel_usuario AS ENUM (
 CREATE TABLE endereco (
     id SERIAL PRIMARY KEY, 
     ende VARCHAR(150) NOT NULL UNIQUE,
-    bairro VARCHAR(50),
-    regiao VARCHAR(30)
 );
 
 -- Radar
