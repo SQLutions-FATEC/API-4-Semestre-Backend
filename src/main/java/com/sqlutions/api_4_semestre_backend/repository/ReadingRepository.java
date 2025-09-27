@@ -40,4 +40,7 @@ public interface ReadingRepository extends JpaRepository<Reading, Long> {
     List<Reading> findByRadarId(String radarId);
 
     List<Reading> findByRadarAddressRegion(String region);
+
+    @Query("SELECT r.vehicleType, COUNT(r) FROM Reading r WHERE r.date BETWEEN :start AND :end GROUP BY r.vehicleType")
+    List<Object[]> countReadingsByVehicleTypeDateBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
 }
