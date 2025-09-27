@@ -17,7 +17,8 @@ public class TimeController {
     }
 
     @GetMapping
-    public String getCurrentTime() {
-        return timeService.getCurrentTimeClampedToDatabase().toString();
+    public String[] getDatabaseTimeStrings() {
+        return new String[] { timeService.getStartTime().toString(), timeService.getEndTime().toString(),
+                timeService.getCurrentTimeClampedToDatabase().toString() };
     }
 }
