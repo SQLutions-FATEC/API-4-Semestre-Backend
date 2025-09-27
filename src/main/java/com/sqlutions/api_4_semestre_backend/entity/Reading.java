@@ -16,14 +16,14 @@ public class Reading {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rad")
     private Radar radar;
 
     @Column(name = "dat_hora")
-    private java.time.LocalDate date;
+    private java.time.LocalDateTime date;
 
     @Column(name = "tip_vei")
     private String vehicleType; // TODO: investigar se há conflito com o Enum do psql depois.
@@ -31,11 +31,11 @@ public class Reading {
     @Column(name = "vel")
     private Integer speed;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -47,11 +47,11 @@ public class Reading {
         this.radar = radar;
     }
 
-    public java.time.LocalDate getDate() {
+    public java.time.LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(java.time.LocalDate date) {
+    public void setDate(java.time.LocalDateTime date) {
         this.date = date;
     }
 
