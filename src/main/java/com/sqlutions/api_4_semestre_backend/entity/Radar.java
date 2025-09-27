@@ -17,7 +17,7 @@ public class Radar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "id_end")
@@ -32,11 +32,11 @@ public class Radar {
     @Column(name = "vel_reg")
     private Integer regulatedSpeed;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
