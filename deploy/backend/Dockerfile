@@ -1,12 +1,12 @@
 FROM openjdk:17-jdk-slim AS build
 
 ARG REPO_URL
-ARG GIT_BRANCH
+ARG BACKEND_BRANCH
 WORKDIR /app
 
 # Clonar o repositório
 RUN apt-get update && apt-get install -y git && \
-    git clone --branch ${GIT_BRANCH} --single-branch https://github.com/SQLutions-FATEC/API-4-Semestre-Backend.git .
+    git clone --branch ${BACKEND_BRANCH} --single-branch https://github.com/SQLutions-FATEC/API-4-Semestre-Backend.git .
 
 RUN chmod +x ./mvnw
 
