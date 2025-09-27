@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sqlutions.api_4_semestre_backend.entity.Radar;
+import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
 
 @Service
@@ -16,10 +18,45 @@ public class ReadingServiceImpl implements ReadingService {
     private TimeService timeService;
 
     @Override
-    public List<Object[]> getReadingTypes() {
-        java.time.LocalDateTime timeEnd = timeService.getCurrentTimeClampedToDatabase();
-        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(6000);
-        return readingRepository.countReadingsByVehicleTypeDateBetween(timeStart, timeEnd);
+    public List<Object[]> getReadingVehicleTypes(int minutes) {
+        return readingRepository.countReadingsByVehicleTypeDateBetween(
+                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
+                timeService.getCurrentTimeClampedToDatabase());
+    }
+
+    @Override
+    public List<Reading> getReadingsFromLastMinutes(int minutes) {
+        return readingRepository.findByDateBetween(
+                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
+                timeService.getCurrentTimeClampedToDatabase());
+    }
+
+    @Override
+    public List<Reading> getReadingsFromLastMinutesByAddress(String[] address, int minutes) {
+        return readingRepository.findByRadarAddressInAndDateBetween(List.of(address),
+                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
+                timeService.getCurrentTimeClampedToDatabase());
+    }
+
+    @Override
+    public List<Reading> getReadingsFromLastMinutesByRadar(Radar[] radar, int minutes) {
+        return readingRepository.findByRadarInAndDateBetween(List.of(radar),
+                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
+                timeService.getCurrentTimeClampedToDatabase());
+    }
+
+    @Override
+    public List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes) {
+        return readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(regions),
+                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
+                timeService.getCurrentTimeClampedToDatabase());
+    }
+
+    @Override
+    public List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes) {
+        return readingRepository.findByRadarAddressNeighborhoodInAndDateBetween(List.of(neighborhoods),
+                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
+                timeService.getCurrentTimeClampedToDatabase());
     }
 
 }
