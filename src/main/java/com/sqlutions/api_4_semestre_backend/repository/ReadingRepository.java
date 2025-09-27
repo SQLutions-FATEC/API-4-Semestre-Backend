@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 
-public interface ReadingRepository extends JpaRepository<Reading, Long> {
+public interface ReadingRepository extends JpaRepository<Reading, Integer> {
     // estrutura:
     // CREATE TABLE leitura (
     // id SERIAL PRIMARY KEY,

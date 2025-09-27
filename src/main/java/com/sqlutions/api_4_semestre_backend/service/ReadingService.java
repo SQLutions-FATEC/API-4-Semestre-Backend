@@ -17,4 +17,14 @@ public interface ReadingService {
     List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes);
 
     List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes);
+
+    List<Reading> getAllReadings();
+
+    Reading getReadingById(Integer id);
+
+    Reading createReading(Reading reading);
+
+    Reading updateReading(Reading reading);
+
+    Void deleteReading(Integer id);
 }
