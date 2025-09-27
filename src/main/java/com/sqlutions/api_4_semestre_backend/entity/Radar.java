@@ -23,6 +23,7 @@ public class Radar {
     @JoinColumn(name = "id_end")
     private Address address;
 
+    // TODO: convert radar latitude and longitude to Point type
     @Column(name = "latitude", precision = 9, scale = 6)
     private BigDecimal latitude;
     
