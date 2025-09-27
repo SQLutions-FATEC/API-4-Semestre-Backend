@@ -3,10 +3,9 @@ package com.sqlutions.api_4_semestre_backend.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
@@ -70,6 +69,59 @@ public class IndexServiceImpl implements IndexService {
         return index;
     }
 
+    private Integer getTrafficIndex(List<Reading> readings) {
+        // primeiro, pegar a duração total das leituras (última leitura - primeira
+        // leitura)
+        java.time.LocalDateTime readingLength = readings.stream()
+                .map(Reading::getDate)
+                .max(java.time.LocalDateTime::compareTo)
+                .orElse(java.time.LocalDateTime.now())
+                .minusSeconds(readings.stream()
+                        .map(Reading::getDate)
+                        .min(java.time.LocalDateTime::compareTo)
+                        .orElse(java.time.LocalDateTime.now())
+                        .toLocalTime()
+                        .toSecondOfDay());
+        System.out.println("Reading length: " + readingLength);
+        // depois, calcular a média de leituras por minuto
+        Float averageReadingsPerMinute = readings.size() / (readingLength.toLocalTime().toSecondOfDay() / 60.0f);
+        System.out.println("Average readings per minute: " + averageReadingsPerMinute);
+
+        // calcular a velocidade relativa (média de velocidade / velocidade
+        // regulamentada) (%)
+        Float averageSpeed = (float) readings.stream()
+                .mapToInt(Reading::getSpeed)
+                .average()
+                .orElse(0.0);
+        Float averageRegulatedSpeed = (float) readings.stream()
+                .mapToInt(r -> r.getRadar().getRegulatedSpeed())
+                .average()
+                .orElse(0.0);
+        Float relativeSpeed = (averageSpeed / averageRegulatedSpeed) * 100;
+        System.out.println("Relative speed: " + relativeSpeed);
+
+        // classificar o índice:
+        // I_traf = 1, se D < 100 e V_rel > 70
+        // I_traf = 2, se 100 <= D < 300 e V_rel > 60
+        // I_traf = 3, se 300 <= D < 600 ou 40 <= V_rel <= 60
+        // I_traf = 4, se 600 <= D ou 30 <= V_rel < 40
+        // I_traf = 5, se V_rel < 30
+        Integer index;
+        if (averageReadingsPerMinute < 100 && relativeSpeed > 70) {
+            index = 1;
+        } else if (averageReadingsPerMinute >= 100 && averageReadingsPerMinute < 300 && relativeSpeed > 60) {
+            index = 2;
+        } else if ((averageReadingsPerMinute >= 300 && averageReadingsPerMinute < 600)
+                || (relativeSpeed >= 40 && relativeSpeed <= 60)) {
+            index = 3;
+        } else if (averageReadingsPerMinute >= 600 || (relativeSpeed >= 30 && relativeSpeed < 40)) {
+            index = 4;
+        } else { // relativeSpeed < 30
+            index = 5;
+        }
+        return index;
+    }
+
     /**
      * Calcula o índice geral da cidade para um determinado intervalo de tempo.
      * <p>
@@ -91,49 +143,52 @@ public class IndexServiceImpl implements IndexService {
      * @return valor inteiro representando o índice da cidade (1 a 5, onde menor é
      *         melhor)
      */
-    public Integer getCityIndex(int minutes, java.time.LocalDateTime timestamp) {
-        // TODO: adicionar outros índices
+    public Index getCityIndex(int minutes, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating city index for time range: " + timeStart + " to " + timeEnd);
         List<Reading> readings = readingRepository.findByDateBetween(timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
-        Integer securityIndex = getSecurityIndex(readings);
-
-        return securityIndex;
+        Index index = getIndexFromReadings(readings);
+        return index;
     }
 
     @Override
-    public Integer getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp) {
+    public Index getIndexFromReadings(List<Reading> readings) {
+        if (readings == null || readings.isEmpty()) {
+            throw new IllegalArgumentException("Readings list is null or empty");
+        }
+        Integer trafficIndex = getTrafficIndex(readings);
+        Integer securityIndex = getSecurityIndex(readings);
+
+        return new Index(securityIndex, trafficIndex);
+    }
+
+    @Override
+    public Index getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating radar index for time range: " + timeStart + " to " + timeEnd);
+
         List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
-        if (readings.size() == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No readings found for the specified time range and radars");
-        }
-        Integer securityIndex = getSecurityIndex(readings);
 
-        return securityIndex;
+        Index index = getIndexFromReadings(readings);
+        return index;
     }
 
     @Override
-    public Integer getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp) {
+    public Index getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
+
         List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(region), timeStart,
                 timeEnd);
         System.out.println("Reading count: " + readings.size());
-        if (readings.size() == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No readings found for the specified time range and region");
-        }
-        Integer securityIndex = getSecurityIndex(readings);
 
-        return securityIndex;
+        Index index = getIndexFromReadings(readings);
+
+        return index;
     }
-
 }

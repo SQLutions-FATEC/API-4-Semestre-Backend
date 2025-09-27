@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.service.IndexService;
 import com.sqlutions.api_4_semestre_backend.service.TimeService;
@@ -20,21 +21,21 @@ public class IndexController {
     TimeService timeService;
 
     @GetMapping
-    public Integer getCityIndex(@RequestParam(defaultValue = "1") int minutes,
+    public Index getCityIndex(@RequestParam(defaultValue = "1") int minutes,
             @RequestBody(required = false) java.time.LocalDateTime timestamp) {
         return indexService.getCityIndex(minutes,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
 
     @GetMapping("/radar")
-    public Integer getRadarIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody Radar[] radars,
+    public Index getRadarIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody Radar[] radars,
             @RequestBody(required = false) java.time.LocalDateTime timestamp) {
         return indexService.getRadarIndexes(minutes, radars,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
 
     @GetMapping("/region")
-    public Integer getRegionIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody String region,
+    public Index getRegionIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody String region,
             @RequestBody(required = false) java.time.LocalDateTime timestamp) {
         return indexService.getRegionIndexes(minutes, region,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
