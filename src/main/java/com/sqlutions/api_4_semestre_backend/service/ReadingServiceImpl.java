@@ -84,6 +84,9 @@ public class ReadingServiceImpl implements ReadingService {
         } else {
             reading.setRadar(radar);
         }
+        // TODO: validar tipos de veículo para a leitura.
+        // há uma incoerência entre o ENUM e a estrutura do banco de dados.
+        
         return readingRepository.save(reading);
     }
 

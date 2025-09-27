@@ -10,27 +10,6 @@ import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 
 public interface ReadingRepository extends JpaRepository<Reading, Integer> {
-    // estrutura:
-    // CREATE TABLE leitura (
-    // id SERIAL PRIMARY KEY,
-    // id_rad VARCHAR(9) NOT NULL, --refere-se ao id do radar
-    // dat_hora TIMESTAMP NOT NULL,
-    // tip_vei tipo_veiculo NOT NULL,
-    // vel INT NOT NULL,
-    // CONSTRAINT fk_leitura_radar FOREIGN KEY (id_rad) REFERENCES radar(id)
-    // );
-
-    // funções úteis:
-    // pegar a primeira leitura do banco de dados
-    // pegar a última leitura do banco de dados
-    // pegar todas as leituras de um período de tempo
-    // pegar todas as leituras de um radar específico
-    // pegar todas as leituras de uma região específica
-
-    Reading findFirstByOrderByDateAsc();
-
-    Reading findFirstByOrderByDateDesc();
-
     @Query("SELECT MIN(r.date) FROM Reading r")
     java.time.LocalDateTime findMinDate();
 
