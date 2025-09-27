@@ -8,6 +8,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y git && \
     git clone --branch ${GIT_BRANCH} --single-branch https://github.com/SQLutions-FATEC/API-4-Semestre-Frontend.git .
 
+# Aumentar o limite de RAM pra build
+
+ENV NODE_OPTIONS="--max-old-space-size=4096" 
+
 RUN npm install
 RUN npm run build
 
