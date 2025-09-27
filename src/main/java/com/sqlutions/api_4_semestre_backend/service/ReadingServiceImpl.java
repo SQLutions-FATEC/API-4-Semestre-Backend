@@ -12,6 +12,8 @@ import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.repository.RadarRepository;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
 
+import io.micrometer.common.lang.Nullable;
+
 @Service
 public class ReadingServiceImpl implements ReadingService {
     @Autowired
@@ -24,45 +26,45 @@ public class ReadingServiceImpl implements ReadingService {
     private TimeService timeService;
 
     @Override
-    public List<Object[]> getReadingVehicleTypes(int minutes) {
+    public List<Object[]> getReadingVehicleTypes(int minutes, @Nullable java.time.LocalDateTime startDate) {
         return readingRepository.countReadingsByVehicleTypeDateBetween(
-                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
-                timeService.getCurrentTimeClampedToDatabase());
+                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
+                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutes(int minutes) {
+    public List<Reading> getReadingsFromLastMinutes(int minutes, @Nullable java.time.LocalDateTime startDate) {
         return readingRepository.findByDateBetween(
-                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
-                timeService.getCurrentTimeClampedToDatabase());
+                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
+                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutesByAddress(String[] address, int minutes) {
+    public List<Reading> getReadingsFromLastMinutesByAddress(String[] address, int minutes, @Nullable java.time.LocalDateTime startDate) {
         return readingRepository.findByRadarAddressInAndDateBetween(List.of(address),
-                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
-                timeService.getCurrentTimeClampedToDatabase());
+                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
+                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutesByRadar(Radar[] radar, int minutes) {
+    public List<Reading> getReadingsFromLastMinutesByRadar(Radar[] radar, int minutes, @Nullable java.time.LocalDateTime startDate) {
         return readingRepository.findByRadarInAndDateBetween(List.of(radar),
-                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
-                timeService.getCurrentTimeClampedToDatabase());
+                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
+                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes) {
+    public List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes, @Nullable java.time.LocalDateTime startDate) {
         return readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(regions),
-                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
-                timeService.getCurrentTimeClampedToDatabase());
+                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
+                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes) {
+    public List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes, @Nullable java.time.LocalDateTime startDate) {
         return readingRepository.findByRadarAddressNeighborhoodInAndDateBetween(List.of(neighborhoods),
-                timeService.getCurrentTimeClampedToDatabase().minusMinutes(minutes),
-                timeService.getCurrentTimeClampedToDatabase());
+                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
+                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
 
     @Override
@@ -86,17 +88,18 @@ public class ReadingServiceImpl implements ReadingService {
         }
         // TODO: validar tipos de veículo para a leitura.
         // há uma incoerência entre o ENUM e a estrutura do banco de dados.
-        
+
         return readingRepository.save(reading);
     }
 
     @Override
     public Reading updateReading(Reading reading) {
         String radarId = reading.getRadar().getId();
-        Radar radar = radarRepository.findById(radarId).orElse(null);
-        if (radar == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Radar with id " + radarId + " not found");
-        } else {
+        if (radarId != null) {
+            Radar radar = radarRepository.findById(radarId).orElse(null);
+            if (radar == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Radar with id " + radarId + " not found");
+            }
             reading.setRadar(radar);
         }
         return readingRepository.save(reading);
