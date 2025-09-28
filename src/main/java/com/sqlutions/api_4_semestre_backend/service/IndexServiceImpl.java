@@ -3,7 +3,9 @@ package com.sqlutions.api_4_semestre_backend.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
@@ -50,7 +52,7 @@ public class IndexServiceImpl implements IndexService {
         Long nOverLimit = readings.stream().filter(r -> r.getSpeed() > r.getRadar().getRegulatedSpeed()).count();
         Float overLimitWeight = 0.4f; // peso da porcentagem de carros acima do limite
         Float averageExcessWeight = 0.6f; // peso da média de excesso de velocidade
-        Long percentageOverLimit = (nOverLimit * 100) / totalReadings;
+        Float percentageOverLimit = (nOverLimit * 100f) / totalReadings;
         System.out.println(nOverLimit + " / " + totalReadings + " = " + percentageOverLimit);
 
         Double averageExcess = readings.stream()
@@ -59,19 +61,16 @@ public class IndexServiceImpl implements IndexService {
                 .average()
                 .orElse(0.0);
         System.out.println("Average excess: " + averageExcess);
-        // fórmula para calcular o índice de segurança:
-        // índice = 1 + (porcentagem de carros acima do limite * peso)
-        // + (média de excesso de velocidade * peso)
-        Float rawIndex = ((nOverLimit * overLimitWeight) + (averageExcess.floatValue() * averageExcessWeight))
+        
+        Float rawIndex = ((percentageOverLimit * overLimitWeight) + (averageExcess.floatValue() * averageExcessWeight))
                 / (overLimitWeight + averageExcessWeight);
-        System.out.println("Raw index: " + rawIndex);
-        Integer index = Math.round(1 + 4 * (rawIndex) / 100); // mapear para 1-5
+        System.out.println("Raw index: " + rawIndex + "%");
+        Integer index = Math.round(1 + 4 * (rawIndex / 100)); // mapear para 1-5
         return index;
     }
 
     private Integer getTrafficIndex(List<Reading> readings) {
-        // primeiro, pegar a duração total das leituras (última leitura - primeira
-        // leitura)
+        // primeiro, pegar a duração total das leituras (última leitura - primeira leitura)
         java.time.LocalDateTime readingLength = readings.stream()
                 .map(Reading::getDate)
                 .max(java.time.LocalDateTime::compareTo)
@@ -82,7 +81,7 @@ public class IndexServiceImpl implements IndexService {
                         .orElse(java.time.LocalDateTime.now())
                         .toLocalTime()
                         .toSecondOfDay());
-        System.out.println("Reading length: " + readingLength);
+        System.out.println("Reading length: " + readingLength.toLocalTime().toSecondOfDay() / 60.0f + " minutes");
         // depois, calcular a média de leituras por minuto
         Float averageReadingsPerMinute = readings.size() / (readingLength.toLocalTime().toSecondOfDay() / 60.0f);
         System.out.println("Average readings per minute: " + averageReadingsPerMinute);
@@ -98,7 +97,7 @@ public class IndexServiceImpl implements IndexService {
                 .average()
                 .orElse(0.0);
         Float relativeSpeed = (averageSpeed / averageRegulatedSpeed) * 100;
-        System.out.println("Relative speed: " + relativeSpeed);
+        System.out.println("Relative speed: " + relativeSpeed + "%");
 
         // classificar o índice:
         // I_traf = 1, se D < 100 e V_rel > 70
@@ -106,6 +105,12 @@ public class IndexServiceImpl implements IndexService {
         // I_traf = 3, se 300 <= D < 600 ou 40 <= V_rel <= 60
         // I_traf = 4, se 600 <= D ou 30 <= V_rel < 40
         // I_traf = 5, se V_rel < 30
+        
+        // TODO: apresentar pontos futuros:
+        // considerar o pico do radar como limite para densidade (comparar ao valor de D):
+        // quanto mais perto do pico do radar, pior o índice.
+        // considerar também o horário do dia (ex: 7-9 e 17-19 são piores)
+        
         Integer index;
         if (averageReadingsPerMinute < 100 && relativeSpeed > 70) {
             index = 1;
@@ -149,6 +154,17 @@ public class IndexServiceImpl implements IndexService {
         System.out.println("Calculating city index for time range: " + timeStart + " to " + timeEnd);
         List<Reading> readings = readingRepository.findByDateBetween(timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
+        // get dates of first and last reading
+        java.time.LocalDateTime firstReadingDate = readings.stream()
+                .map(Reading::getDate)
+                .min(java.time.LocalDateTime::compareTo)
+                .orElse(null);
+        java.time.LocalDateTime lastReadingDate = readings.stream()
+                .map(Reading::getDate)
+                .max(java.time.LocalDateTime::compareTo)
+                .orElse(null);
+        System.out.println("First reading date: " + firstReadingDate);
+        System.out.println("Last reading date: " + lastReadingDate);
         Index index = getIndexFromReadings(readings);
         return index;
     }
@@ -156,7 +172,7 @@ public class IndexServiceImpl implements IndexService {
     @Override
     public Index getIndexFromReadings(List<Reading> readings) {
         if (readings == null || readings.isEmpty()) {
-            throw new IllegalArgumentException("Readings list is null or empty");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Readings list is null or empty");
         }
         Integer trafficIndex = getTrafficIndex(readings);
         Integer securityIndex = getSecurityIndex(readings);
