@@ -71,19 +71,19 @@ public class IndexServiceImpl implements IndexService {
 
     private Integer getTrafficIndex(List<Reading> readings) {
         // primeiro, pegar a duração total das leituras (última leitura - primeira leitura)
-        java.time.LocalDateTime readingLength = readings.stream()
+        java.time.LocalDateTime maxDate = readings.stream()
                 .map(Reading::getDate)
                 .max(java.time.LocalDateTime::compareTo)
-                .orElse(java.time.LocalDateTime.now())
-                .minusSeconds(readings.stream()
-                        .map(Reading::getDate)
-                        .min(java.time.LocalDateTime::compareTo)
-                        .orElse(java.time.LocalDateTime.now())
-                        .toLocalTime()
-                        .toSecondOfDay());
-        System.out.println("Reading length: " + readingLength.toLocalTime().toSecondOfDay() / 60.0f + " minutes");
+                .orElse(java.time.LocalDateTime.now());
+        java.time.LocalDateTime minDate = readings.stream()
+                .map(Reading::getDate)
+                .min(java.time.LocalDateTime::compareTo)
+                .orElse(java.time.LocalDateTime.now());
+        java.time.Duration readingLength = java.time.Duration.between(minDate, maxDate);
+        float readingLengthMinutes = readingLength.toSeconds() / 60.0f;
+        System.out.println("Reading length: " + readingLengthMinutes + " minutes");
         // depois, calcular a média de leituras por minuto
-        Float averageReadingsPerMinute = readings.size() / (readingLength.toLocalTime().toSecondOfDay() / 60.0f);
+        Float averageReadingsPerMinute = readings.size() / (readingLengthMinutes == 0 ? 1 : readingLengthMinutes);
         System.out.println("Average readings per minute: " + averageReadingsPerMinute);
 
         // calcular a velocidade relativa (média de velocidade / velocidade
