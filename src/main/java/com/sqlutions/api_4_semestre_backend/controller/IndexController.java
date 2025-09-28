@@ -22,7 +22,7 @@ public class IndexController {
 
     @GetMapping
     public Index getCityIndex(@RequestParam(defaultValue = "1") int minutes,
-            @RequestBody(required = false) java.time.LocalDateTime timestamp) {
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         return indexService.getCityIndex(minutes,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
