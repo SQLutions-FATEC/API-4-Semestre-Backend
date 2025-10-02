@@ -1,0 +1,49 @@
+services:
+  # -------------------- Backend --------------------
+  backend:
+    build:
+      context: ./backend
+      args:
+        # Use the BACKEND_BRANCH variable from the .env file
+        - BACKEND_BRANCH
+        - REPO_URL=https://github.com/SQLutions-FATEC/API-4-Semestre-Backend.git
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Use variables from the .env file instead of hardcoding
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - custom-postgres
+
+  # -------------------- Frontend --------------------
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Use the FRONTEND_BRANCH variable from the .env file
+        - FRONTEND_BRANCH
+        - REPO_URL=https://github.com/SQLutions-FATEC/API-4-Semestre-Frontend.git
+    container_name: vue-app
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # -------------------- Database --------------------
+  custom-postgres:
+    build: ./postgres
+    container_name: psql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
