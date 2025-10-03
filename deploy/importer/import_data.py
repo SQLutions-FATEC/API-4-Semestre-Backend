@@ -147,10 +147,12 @@ def main_etl_process():
         """)
 
         cur.execute("""
-            INSERT INTO radar (id, id_end, latitude, longitude, vel_reg)
+            INSERT INTO radar (id, id_end, position, vel_reg)
             SELECT
-                tmp.camera_numero, e.id, tmp.camera_latitude,
-                tmp.camera_longitude, tmp.velocidadeRegulamentada
+                tmp.camera_numero, 
+                e.id, 
+                ST_SetSRID(ST_MakePoint(tmp.camera_longitude, tmp_camera_latitude), 4326),
+                tmp.velocidadeRegulamentada
             FROM tmp_distinct_radars tmp
             JOIN endereco e ON tmp.endereco = e.ende
             ON CONFLICT (id) DO NOTHING;

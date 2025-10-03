@@ -1,3 +1,5 @@
+CREATE EXTENSION postgis;
+\c api;
 -- Criar tipo ENUM para veículos
 CREATE TYPE tipo_veiculo AS ENUM (
     'Carro',
@@ -12,20 +14,20 @@ CREATE TYPE tipo_veiculo AS ENUM (
 CREATE TYPE nivel_usuario AS ENUM (
     'Admin',
     'Gestor'
-)
+);
 
 -- Endereço
 CREATE TABLE endereco (
     id SERIAL PRIMARY KEY,
-    ende VARCHAR(150) NOT NULL UNIQUE
+    ende VARCHAR(150) NOT NULL UNIQUE,
+    regiao VARCHAR(6) 
 );
 
 -- Radar
 CREATE TABLE radar (
     id VARCHAR(9) PRIMARY KEY, -- camera_numero
     id_end INT NOT NULL, --refere-se ao id do endereço
-    latitude DECIMAL(9,6) NOT NULL,
-    longitude DECIMAL(9,6) NOT NULL,
+    position GEOMETRY(Point, 4326),
     vel_reg INT NOT NULL,
     CONSTRAINT fk_radar_endereco FOREIGN KEY (id_end) REFERENCES endereco(id)
 );
