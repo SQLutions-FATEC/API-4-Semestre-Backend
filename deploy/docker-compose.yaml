@@ -4,26 +4,24 @@ services:
     build:
       context: ./backend
       args:
-        # Use the BACKEND_BRANCH variable from the .env file
         - BACKEND_BRANCH
         - REPO_URL=https://github.com/SQLutions-FATEC/API-4-Semestre-Backend.git
     container_name: spring-boot-app
     ports:
       - "8080:8080"
     environment:
-      # Use variables from the .env file instead of hardcoding
       - SPRING_DATASOURCE_URL
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
-      - custom-postgres
+      importer: # The backend now waits for the importer to finish
+        condition: service_completed_successfully
 
   # -------------------- Frontend --------------------
   frontend:
     build:
       context: ./frontend
       args:
-        # Use the FRONTEND_BRANCH variable from the .env file
         - FRONTEND_BRANCH
         - REPO_URL=https://github.com/SQLutions-FATEC/API-4-Semestre-Frontend.git
     container_name: vue-app
@@ -44,6 +42,42 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    command: 
+      - "postgres"
+      - "-c"
+      - "maintenance_work_mem=1GB"
+      - "-c"
+      - "max_wal_size=6GB"
+      - "-c"
+      - "checkpoint_timeout=3600s"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "shared_buffers=2GB"  # Assuming container has 8GB+ RAM
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "fsync=off" # Use with extreme caution, see note below
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sqlutions -d api"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------- Importer --------------------
+  importer:
+      build: ./importer
+      environment:
+        - PYTHONUNBUFFERED=1
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_DB=${POSTGRES_DB}
+        - DB_HOST=custom-postgres
+      depends_on:
+        custom-postgres:
+          condition: service_healthy
+      volumes:
+        - ./data:/app/data
 
 volumes:
   pgdata:
