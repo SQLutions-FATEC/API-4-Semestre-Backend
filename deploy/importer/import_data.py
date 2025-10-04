@@ -151,7 +151,7 @@ def main_etl_process():
             SELECT
                 tmp.camera_numero, 
                 e.id, 
-                ST_SetSRID(ST_MakePoint(tmp.camera_longitude, tmp_camera_latitude), 4326),
+                ST_SetSRID(ST_MakePoint(tmp.camera_longitude, tmp.camera_latitude), 4326),
                 tmp.velocidadeRegulamentada
             FROM tmp_distinct_radars tmp
             JOIN endereco e ON tmp.endereco = e.ende
@@ -201,8 +201,8 @@ def main_etl_process():
         print("\nConexão principal com o banco de dados encerrada.")
 
 if __name__ == "__main__":
-    import_needed = check_for_data()
-    if import_needed:
+    data_found = check_for_data()
+    if not data_found:
         total_start_time = time.time()
         main_etl_process()
         print(f"\n✨ Processo completo finalizado em {time.time() - total_start_time:.2f} segundos. ✨")
