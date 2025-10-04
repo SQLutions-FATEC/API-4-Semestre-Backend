@@ -1,4 +1,3 @@
-CREATE EXTENSION postgis;
 \c api;
 -- Criar tipo ENUM para veículos
 CREATE TYPE tipo_veiculo AS ENUM (

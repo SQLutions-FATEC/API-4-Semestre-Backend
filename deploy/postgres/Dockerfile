@@ -1,4 +1,4 @@
-FROM postgis:16
+FROM postgis/postgis:16-3.4
 
 ENV POSTGRES_USER sqlutions
 ENV POSTGRES_PASSWORD api
