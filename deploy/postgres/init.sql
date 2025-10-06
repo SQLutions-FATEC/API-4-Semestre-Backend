@@ -19,14 +19,16 @@ CREATE TYPE nivel_usuario AS ENUM (
 CREATE TABLE endereco (
     id SERIAL PRIMARY KEY,
     ende VARCHAR(150) NOT NULL UNIQUE,
-    regiao VARCHAR(6) 
+    bairro VARCHAR(50),
+    regiao VARCHAR(30),
+    trecho GEOMETRY(LineString, 4326),
 );
 
 -- Radar
 CREATE TABLE radar (
     id VARCHAR(9) PRIMARY KEY, -- camera_numero
     id_end INT NOT NULL, --refere-se ao id do endereço
-    position GEOMETRY(Point, 4326),
+    localizacao GEOMETRY(Point, 4326),
     vel_reg INT NOT NULL,
     CONSTRAINT fk_radar_endereco FOREIGN KEY (id_end) REFERENCES endereco(id)
 );
