@@ -36,7 +36,7 @@ public class RadarServiceImpl implements RadarService {
         Long addressId = radar.getAddress().getId();
         if (radar.getRegulatedSpeed() == null || radar.getRegulatedSpeed() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Regulated speed must be greater than 0");
-        } else if (radar.getLatitude() == null || radar.getLongitude() == null) {
+        } else if (radar.getLocation() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Latitude and Longitude must be provided");
         } else if (addressId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Address must be provided");

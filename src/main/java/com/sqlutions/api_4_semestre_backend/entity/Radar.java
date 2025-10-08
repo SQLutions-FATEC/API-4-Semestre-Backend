@@ -1,6 +1,6 @@
 package com.sqlutions.api_4_semestre_backend.entity;
 
-import java.math.BigDecimal;
+import org.locationtech.jts.geom.Point;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,12 +23,8 @@ public class Radar {
     @JoinColumn(name = "id_end")
     private Address address;
 
-    // TODO: convert radar latitude and longitude to Point type
-    @Column(name = "latitude", precision = 9, scale = 6)
-    private BigDecimal latitude;
-    
-    @Column(name = "longitude", precision = 9, scale = 6)
-    private BigDecimal longitude;
+    @Column(name = "localizacao", columnDefinition = "GEOMETRY(Point, 4326)")
+    private Point location;
 
     @Column(name = "vel_reg")
     private Integer regulatedSpeed;
@@ -49,20 +45,12 @@ public class Radar {
         this.address = address;
     }
 
-    public BigDecimal getLatitude() {
-        return latitude;
+    public Point getLocation() {
+        return location;
     }
 
-    public void setLatitude(BigDecimal latitude) {
-        this.latitude = latitude;
-    }
-
-    public BigDecimal getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(BigDecimal longitude) {
-        this.longitude = longitude;
+    public void setLocation(Point location) {
+        this.location = location;
     }
 
     public Integer getRegulatedSpeed() {
@@ -73,5 +61,4 @@ public class Radar {
         this.regulatedSpeed = regulatedSpeed;
     }
 
-    
 }
