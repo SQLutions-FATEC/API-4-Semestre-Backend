@@ -21,7 +21,7 @@ CREATE TABLE endereco (
     ende VARCHAR(150) NOT NULL UNIQUE,
     bairro VARCHAR(50),
     regiao VARCHAR(30),
-    trecho GEOMETRY(LineString, 4326),
+    trecho GEOMETRY(LineString, 4326)
 );
 
 -- Radar
