@@ -147,7 +147,7 @@ def main_etl_process():
         """)
 
         cur.execute("""
-            INSERT INTO radar (id, id_end, position, vel_reg)
+            INSERT INTO radar (id, id_end, localizacao, vel_reg)
             SELECT
                 tmp.camera_numero, 
                 e.id, 

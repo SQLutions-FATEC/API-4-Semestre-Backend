@@ -19,11 +19,14 @@ public class Address {
     @Column(nullable = false, name = "ende")
     private String address;
 
-    @Column(nullable = false, name = "bairro")
+    @Column(nullable = true, name = "bairro")
     private String neighborhood;
 
-    @Column(nullable = false, name = "regiao")
+    @Column(nullable = true, name = "regiao")
     private String region;
+
+    @Column(nullable = true, name = "trecho", columnDefinition = "GEOMETRY(LineString,4326)")
+    private org.locationtech.jts.geom.LineString stretch;
 
     public Long getId() {
         return id;
@@ -35,6 +38,14 @@ public class Address {
 
     public String getAddress() {
         return address;
+    }
+
+    public org.locationtech.jts.geom.LineString getStretch() {
+        return stretch;
+    }
+
+    public void setStretch(org.locationtech.jts.geom.LineString stretch) {
+        this.stretch = stretch;
     }
 
     public void setAddress(String address) {
