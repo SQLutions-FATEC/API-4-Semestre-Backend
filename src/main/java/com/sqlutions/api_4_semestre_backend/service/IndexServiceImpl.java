@@ -81,6 +81,8 @@ public class IndexServiceImpl implements IndexService {
                 .orElse(java.time.LocalDateTime.now());
         java.time.Duration readingLength = java.time.Duration.between(minDate, maxDate);
         float readingLengthMinutes = readingLength.toSeconds() / 60.0f;
+        System.out.println("Reading start: " + minDate);
+        System.out.println("Reading end: " + maxDate);
         System.out.println("Reading length: " + readingLengthMinutes + " minutes");
         // depois, calcular a média de leituras por minuto
         Float averageReadingsPerMinute = readings.size() / (readingLengthMinutes == 0 ? 1 : readingLengthMinutes);
@@ -148,7 +150,7 @@ public class IndexServiceImpl implements IndexService {
      * @return valor inteiro representando o índice da cidade (1 a 5, onde menor é
      *         melhor)
      */
-    public Index getCityIndex(int minutes, java.time.LocalDateTime timestamp) {
+    public List<Index> getCityIndex(int minutes, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating city index for time range: " + timeStart + " to " + timeEnd);
@@ -165,23 +167,120 @@ public class IndexServiceImpl implements IndexService {
                 .orElse(null);
         System.out.println("First reading date: " + firstReadingDate);
         System.out.println("Last reading date: " + lastReadingDate);
-        Index index = getIndexFromReadings(readings);
+        List<Index> index = getIndexFromReadings(readings);
         return index;
     }
 
+    /**
+     * Calculates an aggregated {@link Index} from a list of {@link Reading} objects by grouping them
+     * according to the total period covered by the readings.
+     * <p>
+     * Grouping rules:
+     * <ul>
+     *   <li>If the period is less than 1 hour, readings are grouped by 10-minute intervals.</li>
+     *   <li>If the period is less than 1 day, readings are grouped by hour.</li>
+     *   <li>If the period is less than 7 days, readings are grouped by day.</li>
+     * </ul>
+     * <p>
+     * For each group, the method calculates a traffic index and a security index, then aggregates
+     * these indexes across all groups to produce a final {@link Index} result.
+     * <p>
+     * Special handling is performed for broken time series to ensure the first and last groups
+     * are properly clamped to the available data range.
+     *
+     * @param readings the list of {@link Reading} objects to process; must not be {@code null} or empty,
+     *                 and must contain at least two readings
+     * @return an aggregated {@link Index} representing the sum of indexes calculated for each group
+     * @throws ResponseStatusException if the readings list is {@code null}, empty, or contains fewer than two readings
+     */
     @Override
-    public Index getIndexFromReadings(List<Reading> readings) {
+    public List<Index> getIndexFromReadings(List<Reading> readings) {
         if (readings == null || readings.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Readings list is null or empty");
         }
-        Integer trafficIndex = getTrafficIndex(readings);
-        Integer securityIndex = getSecurityIndex(readings);
+        // if period is less than 1 hour, group by 10 minutes
+        // if period is more than 12 hours, group by hour
+        // if period is more than 7 days, group by day
 
-        return new Index(securityIndex, trafficIndex);
+        // how to process broken time series:
+        // clamp the first and last reading to be the same size
+        // example: lastTime is 10:30 and we'd like the last 12 hours
+        // then we should get from 10:00-10:30, and from then backwards each hour (9:00-10:00, 8:00-9:00, etc.)
+
+        // for 10 minute group, same goes:
+        // if lastTime is 10:35, then we should get from 10:30-10:35, and from then backwards each 10 minutes (10:20-10:30, 10:10-10:20, etc.)
+        
+        // for daily group, same goes:
+        // if lastTime is 2023-10-01 10:35, then we should get from 2023-10-01 00:00 to 2023-10-01 10:35, and from then backwards each day (2023-09-30 00:00 to 2023-10-01 00:00)
+
+        if (readings.size() < 2) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not enough readings to calculate index");
+        }
+
+        // find the sample period
+        java.time.LocalDateTime firstReadingDate = readings.stream()
+                .map(Reading::getDate)
+                .min(java.time.LocalDateTime::compareTo)
+                .orElse(null);
+        java.time.LocalDateTime lastReadingDate = readings.stream()
+                .map(Reading::getDate)
+                .max(java.time.LocalDateTime::compareTo)
+                .orElse(null);
+        List<List<Reading>> groupedReadings = new java.util.ArrayList<>();
+        java.time.Duration samplePeriod = java.time.Duration.between(firstReadingDate, lastReadingDate);
+        if (samplePeriod.compareTo(java.time.Duration.ofHours(1)) < 0) {
+            System.out.println("Sample period is less than 1 hour, grouping by 10 minutes");
+            readings.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
+            groupedReadings = new java.util.ArrayList<>(
+                readings.stream()
+                    .collect(java.util.stream.Collectors.groupingBy(r -> 
+                        r.getDate().withMinute((r.getDate().getMinute() / 10) * 10).withSecond(0).withNano(0)
+                    ))
+                    .values()
+            );
+        } else if (samplePeriod.compareTo(java.time.Duration.ofDays(1)) < 0) {
+            System.out.println("Sample period is less than 12 hours, grouping by hour");
+            readings.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
+            groupedReadings = new java.util.ArrayList<>(
+                readings.stream()
+                    .collect(java.util.stream.Collectors.groupingBy(r -> 
+                        r.getDate().withMinute(0).withSecond(0).withNano(0).withHour(r.getDate().getHour())
+                    ))
+                    .values()
+            );
+        } else if (samplePeriod.compareTo(java.time.Duration.ofDays(7)) < 0) {
+            System.out.println("Sample period is less than 7 days, grouping by day");
+            readings.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
+            groupedReadings = new java.util.ArrayList<>(
+                readings.stream()
+                    .collect(java.util.stream.Collectors.groupingBy(r -> 
+                        r.getDate().withHour(0).withMinute(0).withSecond(0).withNano(0)
+                    ))
+                    .values()
+            );
+        }
+
+        // now, for each reading group, calculate the indexes and add them to the output index list
+        System.out.println("Calculating indexes from readings");
+        List<Index> output = groupedReadings.stream()
+            .map(group -> {
+                Integer trafficIndex = getTrafficIndex(group);
+                Integer securityIndex = getSecurityIndex(group);
+                return new Index(securityIndex, trafficIndex, group.get(0).getDate(), group.get(group.size() - 1).getDate());
+            })
+            .toList();
+        System.out.println("Calculated " + output.size() + " indexes from readings");
+        // return the indexes grouped by time
+        return groupedReadings.stream()
+            .map(group -> {
+                Integer trafficIndex = getTrafficIndex(group);
+                Integer securityIndex = getSecurityIndex(group);
+                return new Index(securityIndex, trafficIndex, group.get(0).getDate(), group.get(group.size() - 1).getDate());
+            }).toList();
     }
 
     @Override
-    public Index getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp) {
+    public List<Index> getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating radar index for time range: " + timeStart + " to " + timeEnd);
@@ -189,12 +288,12 @@ public class IndexServiceImpl implements IndexService {
         List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
 
-        Index index = getIndexFromReadings(readings);
+        List<Index> index = getIndexFromReadings(readings);
         return index;
     }
 
     @Override
-    public Index getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp) {
+    public List<Index> getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
@@ -203,7 +302,7 @@ public class IndexServiceImpl implements IndexService {
                 timeEnd);
         System.out.println("Reading count: " + readings.size());
 
-        Index index = getIndexFromReadings(readings);
+        List<Index> index = getIndexFromReadings(readings);
 
         return index;
     }

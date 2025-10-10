@@ -7,11 +7,11 @@ import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 
 public interface IndexService {
-    Index getCityIndex(int minutes, java.time.LocalDateTime timestamp);
+    List<Index> getCityIndex(int minutes, java.time.LocalDateTime timestamp);
 
-    Index getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp);
+    List<Index> getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp);
 
-    Index getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp);
+    List<Index> getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp);
 
-    Index getIndexFromReadings(List<Reading> readings);
+    List<Index> getIndexFromReadings(List<Reading> readings);
 }
