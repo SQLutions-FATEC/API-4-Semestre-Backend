@@ -16,9 +16,11 @@ public interface ReadingService {
 
     List<Reading> getReadingsFromLastMinutesByRadar(Radar[] radar, int minutes, @Nullable java.time.LocalDateTime startDate);
 
-    List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes, @Nullable java.time.LocalDateTime startDate);
+    List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] region, int minutes, @Nullable java.time.LocalDateTime startDate);
 
-    List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes, @Nullable java.time.LocalDateTime startDate);
+    List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhood, int minutes, @Nullable java.time.LocalDateTime startDate);
+
+    List<Reading> getReadingsFromLastMinutesByAddressStreet(String[] street, int minutes, @Nullable java.time.LocalDateTime startDate);
 
     List<Reading> getAllReadings();
 

@@ -71,18 +71,24 @@ public class ReadingController {
     }
 
     @GetMapping("/address/region")
-    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByAddressRegion(@RequestBody String[] regions,
+    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByAddressRegion(@RequestBody String[] region,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        return ResponseEntity.ok(readingService.getReadingsFromLastMinutesByAddressRegion(regions, minutes, timestamp));
+        return ResponseEntity.ok(readingService.getReadingsFromLastMinutesByAddressRegion(region, minutes, timestamp));
     }
 
     @GetMapping("/address/neighborhood")
-    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByAddressNeighborhood(
-            @RequestBody String[] neighborhoods, @RequestParam(defaultValue = "1") int minutes,
+    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByAddressNeighborhood(@RequestBody String[] neighborhood, 
+            @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        return ResponseEntity
-                .ok(readingService.getReadingsFromLastMinutesByAddressNeighborhood(neighborhoods, minutes, timestamp));
+        return ResponseEntity.ok(readingService.getReadingsFromLastMinutesByAddressNeighborhood(neighborhood, minutes, timestamp));
+    }
+
+     @GetMapping("/address/street")
+    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByAddressStreet(@RequestBody String[] street, 
+            @RequestParam(defaultValue = "1") int minutes,
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+        return ResponseEntity.ok(readingService.getReadingsFromLastMinutesByAddressStreet(street, minutes, timestamp));
     }
 
     @GetMapping("/radar")

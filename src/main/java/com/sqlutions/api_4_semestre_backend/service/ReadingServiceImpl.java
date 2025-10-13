@@ -54,15 +54,22 @@ public class ReadingServiceImpl implements ReadingService {
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes, @Nullable java.time.LocalDateTime startDate) {
-        return readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(regions),
+    public List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] region, int minutes, @Nullable java.time.LocalDateTime startDate) {
+        return readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(region),
                 (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
                 startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes, @Nullable java.time.LocalDateTime startDate) {
-        return readingRepository.findByRadarAddressNeighborhoodInAndDateBetween(List.of(neighborhoods),
+    public List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhood, int minutes, @Nullable java.time.LocalDateTime startDate) {
+        return readingRepository.findByRadarAddressNeighborhoodInAndDateBetween(List.of(neighborhood),
+                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
+                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
+    }
+
+    @Override
+    public List<Reading> getReadingsFromLastMinutesByAddressStreet(String[] street, int minutes, @Nullable java.time.LocalDateTime startDate) {
+        return readingRepository.findByRadarAddressStreetInAndDateBetween(List.of(street),
                 (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
                 startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
     }
