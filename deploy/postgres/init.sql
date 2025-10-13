@@ -49,5 +49,11 @@ CREATE TABLE usuario (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(100) NOT NULL,
-    nivel nivel_usuario NOT NULL
+    nivel nivel_usuario NOT NULL,
+
+    -- Campos adicionados para notificações automáticas
+    recebe_notificacao BOOLEAN DEFAULT FALSE,               -- Indica se o usuário deseja receber notificações
+    canal_notificacao VARCHAR(30) DEFAULT 'whatsapp',       -- Canal preferencial: whatsapp, telegram, email, push, slack etc.
+    ultimo_alerta TIMESTAMP,                                -- Data/hora do último alerta enviado
+    indices_interesse VARCHAR(200)                          -- Índices de interesse (ex: 'Segurança, Mobilidade')
 );
