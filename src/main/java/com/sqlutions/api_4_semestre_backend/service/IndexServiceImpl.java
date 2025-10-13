@@ -224,12 +224,12 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public Index getStreetIndexes(int minutes, String street, java.time.LocalDateTime timestamp) {
+    public Index getAdressIndexes(int minutes, String adress, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
-        System.out.println("Calculating street index for time range: " + timeStart + " to " + timeEnd);
+        System.out.println("Calculating adress index for time range: " + timeStart + " to " + timeEnd);
 
-        List<Reading> readings = readingRepository.findByRadarAddressStreetInAndDateBetween(List.of(street), timeStart,
+        List<Reading> readings = readingRepository.findByRadarAddressInAndDateBetween(List.of(adress), timeStart,
                 timeEnd);
         System.out.println("Reading count: " + readings.size());
 

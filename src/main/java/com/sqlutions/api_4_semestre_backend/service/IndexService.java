@@ -15,7 +15,7 @@ public interface IndexService {
 
     Index getNeighborhoodIndexes(int minutes, String neighborhood, java.time.LocalDateTime timestamp);
 
-    Index getStreetIndexes(int minutes, String street, java.time.LocalDateTime timestamp);
+    Index getAdressIndexes(int minutes, String adress, java.time.LocalDateTime timestamp);
 
     Index getIndexFromReadings(List<Reading> readings);
 }

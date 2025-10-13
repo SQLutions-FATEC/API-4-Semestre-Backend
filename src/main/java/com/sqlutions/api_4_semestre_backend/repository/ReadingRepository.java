@@ -24,7 +24,7 @@ public interface ReadingRepository extends JpaRepository<Reading, Integer> {
 
     List<Reading> findByRadarAddressNeighborhood(String neighborhood);
 
-    List<Reading> findByRadarAddressStreet(String street);
+    List<Reading> findByRadarAddress(String adress);
 
     @Query("SELECT r.vehicleType, COUNT(r) FROM Reading r WHERE r.date BETWEEN :start AND :end GROUP BY r.vehicleType")
     List<Object[]> countReadingsByVehicleTypeDateBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
@@ -39,8 +39,5 @@ public interface ReadingRepository extends JpaRepository<Reading, Integer> {
             LocalDateTime endTime);
 
     List<Reading> findByRadarAddressNeighborhoodInAndDateBetween(List<String> neighborhood, LocalDateTime startTime,
-            LocalDateTime endTime);
-
-    List<Reading> findByRadarAddressStreetInAndDateBetween(List<String> street, LocalDateTime startTime,
             LocalDateTime endTime);
 }
