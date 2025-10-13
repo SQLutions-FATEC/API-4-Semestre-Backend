@@ -40,4 +40,18 @@ public class IndexController {
         return indexService.getRegionIndexes(minutes, region,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
+
+    @GetMapping("/neighborhood")
+    public Index getNeighborhoodIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody String neighborhood,
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+        return indexService.getNeighborhoodIndexes(minutes, neighborhood,
+                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+    }
+
+    @GetMapping("/street")
+    public Index getStreetIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody String street,
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+        return indexService.getStreetIndexes(minutes, street,
+                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+    }
 }

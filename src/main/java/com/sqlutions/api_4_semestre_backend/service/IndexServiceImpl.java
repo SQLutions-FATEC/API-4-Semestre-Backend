@@ -207,4 +207,34 @@ public class IndexServiceImpl implements IndexService {
 
         return index;
     }
+
+    @Override
+    public Index getNeighborhoodIndexes(int minutes, String neighborhood, java.time.LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        System.out.println("Calculating neighborhood index for time range: " + timeStart + " to " + timeEnd);
+
+        List<Reading> readings = readingRepository.findByRadarAddressNeighborhoodInAndDateBetween(List.of(neighborhood), timeStart,
+                timeEnd);
+        System.out.println("Reading count: " + readings.size());
+
+        Index index = getIndexFromReadings(readings);
+
+        return index;
+    }
+
+    @Override
+    public Index getStreetIndexes(int minutes, String street, java.time.LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        System.out.println("Calculating street index for time range: " + timeStart + " to " + timeEnd);
+
+        List<Reading> readings = readingRepository.findByRadarAddressStreetInAndDateBetween(List.of(street), timeStart,
+                timeEnd);
+        System.out.println("Reading count: " + readings.size());
+
+        Index index = getIndexFromReadings(readings);
+
+        return index;
+    }
 }
