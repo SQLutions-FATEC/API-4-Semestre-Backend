@@ -59,7 +59,7 @@ CREATE TABLE regioes (
 
     nome_regiao VARCHAR(100) NOT NULL UNIQUE,
     
-    area_regiao GEOMETRY(Polygon, 31983)
+    area_regiao GEOMETRY(Polygon, 4326)
 );
 
 -- Pontos de onibus
