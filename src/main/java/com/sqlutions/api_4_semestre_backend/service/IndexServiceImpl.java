@@ -197,7 +197,8 @@ public class IndexServiceImpl implements IndexService {
     public Index getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
-        System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
+        System.out.println("PORRA region index for time range: " + timeStart + " to " + timeEnd);
+        System.out.println(region);
 
         List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(region), timeStart,
                 timeEnd);
@@ -224,12 +225,12 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public Index getAdressIndexes(int minutes, String adress, java.time.LocalDateTime timestamp) {
+    public Index getAddressIndexes(int minutes, String address, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
-        System.out.println("Calculating adress index for time range: " + timeStart + " to " + timeEnd);
+        System.out.println("Calculating address index for time range: " + timeStart + " to " + timeEnd);
 
-        List<Reading> readings = readingRepository.findByRadarAddressInAndDateBetween(List.of(adress), timeStart,
+        List<Reading> readings = readingRepository.findByRadarAddressAddressInAndDateBetween(List.of(address), timeStart,
                 timeEnd);
         System.out.println("Reading count: " + readings.size());
 
