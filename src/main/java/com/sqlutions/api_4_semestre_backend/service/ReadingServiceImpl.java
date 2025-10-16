@@ -77,27 +77,27 @@ public class ReadingServiceImpl implements ReadingService {
     }
 
     @Override
-    public List<ReadingInformation> getReadingsFromLastMinutesByAddress(String[] address, int minutes,
+    public List<ReadingInformation> getReadingsFromLastMinutesByAddress(List<String> address, int minutes,
             @Nullable java.time.LocalDateTime startDate) {
-        List<Reading> readings = readingRepository.findByRadarAddressInAndDateBetween(List.of(address),
+        List<Reading> readings = readingRepository.findByRadarAddressAddressInAndDateBetween(address,
                 (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
                 startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
         return groupReadings(readings);
     }
 
     @Override
-    public List<ReadingInformation> getReadingsFromLastMinutesByRadar(Radar[] radar, int minutes,
+    public List<ReadingInformation> getReadingsFromLastMinutesByRadar(List<Radar> radar, int minutes,
             @Nullable java.time.LocalDateTime startDate) {
-        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radar),
+        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(radar,
                 (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
                 startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
         return groupReadings(readings);
     }
 
     @Override
-    public List<ReadingInformation> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes,
+    public List<ReadingInformation> getReadingsFromLastMinutesByAddressRegion(List<String> regions, int minutes,
             @Nullable java.time.LocalDateTime startDate) {
-        List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(regions),
+        List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(regions,
                 (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
                 startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
         return groupReadings(readings);

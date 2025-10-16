@@ -67,9 +67,11 @@ public class ReadingController {
     }
 
     @GetMapping("/address")
-    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddress(@RequestBody String[] address,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddress(@RequestBody List<String> address,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+                System.out.println("QUE");
+                System.out.println(address);
         List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByAddress(address, minutes,
                 timestamp);
         for (ReadingInformation info : readings) {
@@ -80,7 +82,7 @@ public class ReadingController {
 
     @GetMapping("/address/region")
     public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddressRegion(
-            @RequestBody String[] regions,
+            @RequestBody List<String> regions,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByAddressRegion(regions, minutes,
@@ -92,7 +94,7 @@ public class ReadingController {
     }
 
     @GetMapping("/radar")
-    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByRadar(@RequestBody Radar[] radar,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByRadar(@RequestBody List<Radar> radar,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByRadar(radar, minutes, timestamp);

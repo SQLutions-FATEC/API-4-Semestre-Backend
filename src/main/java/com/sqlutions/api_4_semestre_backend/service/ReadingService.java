@@ -12,11 +12,11 @@ import io.micrometer.common.lang.Nullable;
 public interface ReadingService {
     List<ReadingInformation> getReadingsFromLastMinutes(int minutes, @Nullable LocalDateTime startDate);
 
-    List<ReadingInformation> getReadingsFromLastMinutesByAddress(String[] address, int minutes, @Nullable LocalDateTime startDate);
+    List<ReadingInformation> getReadingsFromLastMinutesByAddress(List<String> address, int minutes, @Nullable LocalDateTime startDate);
 
-    List<ReadingInformation> getReadingsFromLastMinutesByRadar(Radar[] radar, int minutes, @Nullable LocalDateTime startDate);
+    List<ReadingInformation> getReadingsFromLastMinutesByRadar(List<Radar> radar, int minutes, @Nullable LocalDateTime startDate);
 
-    List<ReadingInformation> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes, @Nullable LocalDateTime startDate);
+    List<ReadingInformation> getReadingsFromLastMinutesByAddressRegion(List<String> regions, int minutes, @Nullable LocalDateTime startDate);
 
     List<ReadingInformation> getAllReadings();
 
