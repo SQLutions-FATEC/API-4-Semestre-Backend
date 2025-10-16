@@ -63,4 +63,11 @@ public class IndexController {
         return indexService.getRegionIndexSeries(minutes, region,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
+
+     @GetMapping("/address")
+    public Index getAddressIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestParam String address,
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+        return indexService.getAddressIndexes(minutes, address,
+                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+    }
 }

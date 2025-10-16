@@ -19,9 +19,6 @@ public class Address {
     @Column(nullable = false, name = "ende")
     private String address;
 
-    @Column(nullable = true, name = "bairro")
-    private String neighborhood;
-
     @Column(nullable = true, name = "regiao")
     private String region;
 
@@ -50,14 +47,6 @@ public class Address {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getNeighborhood() {
-        return neighborhood;
-    }
-
-    public void setNeighborhood(String neighborhood) {
-        this.neighborhood = neighborhood;
     }
 
     public String getRegion() {

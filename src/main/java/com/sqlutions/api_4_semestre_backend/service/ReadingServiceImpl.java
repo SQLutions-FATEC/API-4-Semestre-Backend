@@ -103,16 +103,6 @@ public class ReadingServiceImpl implements ReadingService {
         return groupReadings(readings);
     }
 
-    @Override
-    public List<ReadingInformation> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes,
-            @Nullable java.time.LocalDateTime startDate) {
-        List<Reading> readings = readingRepository.findByRadarAddressNeighborhoodInAndDateBetween(
-                List.of(neighborhoods),
-                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
-                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
-        return groupReadings(readings);
-    }
-
     /**
      * Groups a list of {@link Reading} objects into time-based buckets depending on
      * the sample period and returns them as {@link ReadingInformation} objects.

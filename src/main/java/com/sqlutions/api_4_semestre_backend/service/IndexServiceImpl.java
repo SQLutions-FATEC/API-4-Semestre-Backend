@@ -287,6 +287,7 @@ public class IndexServiceImpl implements IndexService {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
+        System.out.println(region);
 
         List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(region), timeStart,
                 timeEnd);
@@ -327,6 +328,21 @@ public class IndexServiceImpl implements IndexService {
         System.out.println("Reading count: " + readings.size());
 
         return getIndexesWithGroupedReadings(readings);
+    }
+
+    @Override
+    public Index getAddressIndexes(int minutes, String address, java.time.LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        System.out.println("Calculating address index for time range: " + timeStart + " to " + timeEnd);
+
+        List<Reading> readings = readingRepository.findByRadarAddressAddressInAndDateBetween(List.of(address), timeStart,
+                timeEnd);
+        System.out.println("Reading count: " + readings.size());
+
+        Index index = getIndexFromReadings(readings);
+
+        return index;
     }
 
     @Override

@@ -91,18 +91,6 @@ public class ReadingController {
         return ResponseEntity.ok(readings);
     }
 
-    @GetMapping("/address/neighborhood")
-    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddressNeighborhood(
-            @RequestBody String[] neighborhoods, @RequestParam(defaultValue = "1") int minutes,
-            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        List<ReadingInformation> readings = readingService
-                .getReadingsFromLastMinutesByAddressNeighborhood(neighborhoods, minutes, timestamp);
-        for (ReadingInformation info : readings) {
-            info.setReadings(null);
-        }
-        return ResponseEntity.ok(readings);
-    }
-
     @GetMapping("/radar")
     public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByRadar(@RequestBody Radar[] radar,
             @RequestParam(defaultValue = "1") int minutes,

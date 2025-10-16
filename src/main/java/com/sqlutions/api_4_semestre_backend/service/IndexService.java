@@ -16,7 +16,8 @@ public interface IndexService {
     // pegar o nível atual de uma região
     Index getRegionIndex(int minutes, String region, java.time.LocalDateTime timestamp);
 
-    // calcular o índice de um conjunto de leituras
+    Index getAddressIndexes(int minutes, String address, java.time.LocalDateTime timestamp);
+
     Index getIndexFromReadings(List<Reading> readings);
 
     // pegar séries temporais de índices
