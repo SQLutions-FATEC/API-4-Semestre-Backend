@@ -61,13 +61,6 @@ public class ReadingServiceImpl implements ReadingService {
     }
 
     @Override
-    public List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhood, int minutes, @Nullable java.time.LocalDateTime startDate) {
-        return readingRepository.findByRadarAddressNeighborhoodInAndDateBetween(List.of(neighborhood),
-                (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
-                startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
-    }
-
-    @Override
     public List<Reading> getAllReadings() {
         return readingRepository.findAll();
     }

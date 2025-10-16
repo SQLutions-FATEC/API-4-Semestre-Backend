@@ -13,8 +13,6 @@ public interface IndexService {
 
     Index getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp);
 
-    Index getNeighborhoodIndexes(int minutes, String neighborhood, java.time.LocalDateTime timestamp);
-
     Index getAddressIndexes(int minutes, String address, java.time.LocalDateTime timestamp);
 
     Index getIndexFromReadings(List<Reading> readings);

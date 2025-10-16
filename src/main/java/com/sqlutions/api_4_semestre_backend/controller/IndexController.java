@@ -41,13 +41,6 @@ public class IndexController {
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
 
-    @GetMapping("/neighborhood")
-    public Index getNeighborhoodIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestParam String neighborhood,
-            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        return indexService.getNeighborhoodIndexes(minutes, neighborhood,
-                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
-    }
-
      @GetMapping("/address")
     public Index getAddressIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestParam String address,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {

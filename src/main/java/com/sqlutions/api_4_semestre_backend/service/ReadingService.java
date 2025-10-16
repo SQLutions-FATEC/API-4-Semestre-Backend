@@ -18,8 +18,6 @@ public interface ReadingService {
 
     List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] region, int minutes, @Nullable java.time.LocalDateTime startDate);
 
-    List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhood, int minutes, @Nullable java.time.LocalDateTime startDate);
-
     List<Reading> getAllReadings();
 
     Reading getReadingById(Integer id);
