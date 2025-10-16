@@ -49,12 +49,23 @@ def process_file(file_path):
             conn.close()
 
 def check_for_data():
-    conn = psycopg2.connect(**CONN_PARAMS)
-    cursor = conn.cursor()
+    import time
+    retries = 5
+    while retries > 0:
+        try:
+            conn = psycopg2.connect(**CONN_PARAMS)
+            break
+        except psycopg2.OperationalError:
+            retries -= 1
+            print("⏳ Banco de dados indisponível, tentando novamente...")
+            time.sleep(5)
+    else:
+        print("❌ Não foi possível conectar ao banco de dados após várias tentativas.")
+        return False
 
+    cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM leitura;")
     count = cursor.fetchone()[0]
-
     cursor.close()
     conn.close()
 
