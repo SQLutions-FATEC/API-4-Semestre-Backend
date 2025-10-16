@@ -35,9 +35,16 @@ public class IndexController {
     }
 
     @GetMapping("/region")
-    public Index getRegionIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody String region,
+    public Index getRegionIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestParam String region,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         return indexService.getRegionIndexes(minutes, region,
+                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+    }
+
+     @GetMapping("/address")
+    public Index getAddressIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestParam String address,
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+        return indexService.getAddressIndexes(minutes, address,
                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
 }

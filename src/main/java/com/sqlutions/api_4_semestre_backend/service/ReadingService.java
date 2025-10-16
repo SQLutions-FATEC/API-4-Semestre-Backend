@@ -14,11 +14,9 @@ public interface ReadingService {
 
     List<Object[]> getReadingVehicleTypes(int minutes, @Nullable java.time.LocalDateTime startDate);
 
-    List<Reading> getReadingsFromLastMinutesByRadar(Radar[] radar, int minutes, @Nullable java.time.LocalDateTime startDate);
+    List<Reading> getReadingsFromLastMinutesByRadar(Radar[] radars, int minutes, @Nullable java.time.LocalDateTime startDate);
 
-    List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] regions, int minutes, @Nullable java.time.LocalDateTime startDate);
-
-    List<Reading> getReadingsFromLastMinutesByAddressNeighborhood(String[] neighborhoods, int minutes, @Nullable java.time.LocalDateTime startDate);
+    List<Reading> getReadingsFromLastMinutesByAddressRegion(String[] region, int minutes, @Nullable java.time.LocalDateTime startDate);
 
     List<Reading> getAllReadings();
 
