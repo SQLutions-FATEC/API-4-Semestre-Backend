@@ -59,12 +59,12 @@ CREATE TABLE regioes (
 
     nome_regiao VARCHAR(100) NOT NULL UNIQUE,
     
-    area_regiao GEOMETRY(Polygon, 4326)
+    area_regiao GEOMETRY(Polygon, 4326) NOT NULL
 );
 
 -- Pontos de onibus
 
 CREATE TABLE pontos_onibus(
     id BIGINT PRIMARY KEY,
-    ponto GEOMETRY(Point, 4326)
+    ponto GEOMETRY(Point, 4326) NOT NULL
 );
