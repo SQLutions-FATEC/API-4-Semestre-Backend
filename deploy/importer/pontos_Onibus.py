@@ -2,6 +2,7 @@ import json
 import os
 import psycopg2
 from psycopg2 import sql
+from typing import Dict, Any # Adicionado para tipagem
 
 # --- CONFIGURAÇÃO DO BANCO DE DADOS (AGORA USANDO VARIÁVEIS DE AMBIENTE) ---
 # ATENÇÃO: Os valores padrões são definidos apenas para o caso de a variável de ambiente não existir.
@@ -18,6 +19,47 @@ SRID = 4326  # Padrão WGS 84 (GPS)
 
 # Nome do arquivo onde você salvou a saída do Overpass
 NOME_ARQUIVO = 'pontos_onibus.json'
+
+def check_if_data_exists(conn_params: Dict[str, Any], table_name: str) -> bool:
+    """
+    Verifica se a tabela de destino já contém registros (COUNT(*) > 0).
+    Retorna True se houver dados, False caso contrário ou em caso de erro.
+    """
+    conn = None
+    cur = None
+    
+    # Verifica credenciais
+    if not all(conn_params.values()):
+        print(f"❌ ERRO: Variáveis de ambiente do PostgreSQL ausentes para checagem da tabela '{table_name}'.")
+        return False
+        
+    try:
+        conn = psycopg2.connect(**conn_params)
+        cur = conn.cursor()
+        
+        # Query para contar o número de linhas
+        count_query = sql.SQL("SELECT COUNT(*) FROM {};").format(
+            sql.Identifier(table_name)
+        )
+        
+        cur.execute(count_query)
+        count = cur.fetchone()[0]
+        
+        return count > 0
+        
+    except psycopg2.ProgrammingError as e:
+        # Captura erro se a tabela não existir (o que significa que está vazia)
+        if "does not exist" in str(e):
+             print(f"AVISO: Tabela '{table_name}' não encontrada. Assumindo que está vazia.")
+             return False
+        raise # Levanta outros erros de programação
+    except Exception as e:
+        print(f"❌ ERRO inesperado durante a checagem da tabela '{table_name}': {e}")
+        return False
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
+
 
 def extrair_dados_para_db(caminho_arquivo):
     """
@@ -91,6 +133,7 @@ def inserir_pontos_postgis(conn, nome_tabela, pontos, srid):
                 pontos_inseridos += 1
                 
             conn.commit()
+            print(f"✅ Sucesso: {pontos_inseridos} pontos de ônibus inseridos/atualizados na tabela '{nome_tabela}'.")
             
     except Exception as e:
         # Reverter se houver erro
@@ -103,6 +146,18 @@ if __name__ == "__main__":
     
     conn = None
     try:
+        # NOVO PASSO: Checagem de dados antes de processar
+        if check_if_data_exists(CONN_PARAMS, NOME_TABELA):
+            print(f"\n=======================================================")
+            print(f"✅ CONTEÚDO JÁ PRESENTE: A tabela '{NOME_TABELA}' já contém dados.")
+            print(f"A importação será IGNORADA conforme solicitado.")
+            print(f"=======================================================\n")
+            exit(0) # Encerra o script
+            
+        print(f"\n=======================================================")
+        print(f"Tabela '{NOME_TABELA}' VAZIA. Iniciando o processo de importação.")
+        print(f"=======================================================\n")
+        
         # 1. Extrair os dados do arquivo JSON
         dados_pontos = extrair_dados_para_db(NOME_ARQUIVO)
         

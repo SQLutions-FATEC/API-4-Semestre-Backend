@@ -2,7 +2,7 @@ import pandas as pd
 import psycopg2
 from psycopg2 import sql
 from typing import Dict, Any
-import os # <-- Adicionado para usar variáveis de ambiente
+import os 
 
 # --- Configurações do Banco de Dados ---
 # ATENÇÃO: Substituído DB_CONFIG pelo seu novo dicionário de conexão lendo do ambiente
@@ -14,8 +14,54 @@ CONN_PARAMS = {
     "port":     os.getenv("DB_PORT", "5432")
 }
 
+# --- Configurações da Tabela de Destino ---
+NOME_TABELA = "endereco"
+COLUNA_GEOM = "trecho"
+
 # Configuração do nome do arquivo CSV
 CSV_FILE = "dados_com_linhas.csv" 
+
+def check_if_geom_data_exists(conn_params: Dict[str, Any], table_name: str, geom_column: str) -> bool:
+    """
+    Verifica se a coluna de geometria (trecho) na tabela de destino contém algum registro não nulo.
+    Retorna True se houver dados, False caso contrário ou em caso de erro.
+    """
+    conn = None
+    cur = None
+    
+    # Verifica credenciais
+    if not all(conn_params.values()):
+        print(f"❌ ERRO: Variáveis de ambiente do PostgreSQL ausentes para checagem da tabela '{table_name}'.")
+        return False
+        
+    try:
+        conn = psycopg2.connect(**conn_params)
+        cur = conn.cursor()
+        
+        # Query para contar o número de linhas onde a coluna de geometria não é nula
+        count_query = sql.SQL("SELECT COUNT(*) FROM {} WHERE {} IS NOT NULL;").format(
+            sql.Identifier(table_name),
+            sql.Identifier(geom_column)
+        )
+        
+        cur.execute(count_query)
+        count = cur.fetchone()[0]
+        
+        return count > 0
+        
+    except psycopg2.ProgrammingError as e:
+        # Captura erro se a tabela não existir (o que significa que está vazia)
+        if "does not exist" in str(e):
+             print(f"AVISO: Tabela '{table_name}' não encontrada. Assumindo que está vazia.")
+             return False
+        raise # Levanta outros erros de programação
+    except Exception as e:
+        print(f"❌ ERRO inesperado durante a checagem da tabela '{table_name}': {e}")
+        return False
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
+
 
 def process_data_and_import(conn_params: Dict[str, Any]):
     """
@@ -100,6 +146,7 @@ def process_data_and_import(conn_params: Dict[str, Any]):
                     rows_inserted += 1
 
         conn.commit()
+        print(f"✅ Sucesso: {rows_inserted} linhas inseridas e {rows_updated} atualizadas na tabela '{NOME_TABELA}'.")
     
     except psycopg2.Error as e:
         print(f"ERRO de Banco de Dados: {e}")
@@ -114,4 +161,15 @@ def process_data_and_import(conn_params: Dict[str, Any]):
             conn.close()
 
 if __name__ == "__main__":
-    process_data_and_import(CONN_PARAMS) 
+    
+    # NOVO PASSO: Checagem de dados antes de processar, verificando a coluna 'trecho'
+    if check_if_geom_data_exists(CONN_PARAMS, NOME_TABELA, COLUNA_GEOM):
+        print(f"\n=======================================================")
+        print(f"✅ DADOS GEOMÉTRICOS JÁ PRESENTES: A coluna '{COLUNA_GEOM}' na tabela '{NOME_TABELA}' já contém dados.")
+        print(f"A importação será IGNORADA conforme solicitado.")
+        print(f"=======================================================\n")
+    else:
+        print(f"\n=======================================================")
+        print(f"Coluna '{COLUNA_GEOM}' VAZIA. Iniciando o processo de importação/atualização.")
+        print(f"=======================================================\n")
+        process_data_and_import(CONN_PARAMS)
