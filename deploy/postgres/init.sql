@@ -51,3 +51,20 @@ CREATE TABLE usuario (
     senha VARCHAR(100) NOT NULL,
     nivel nivel_usuario NOT NULL
 );
+
+-- Regiões
+
+CREATE TABLE regioes (
+    id SERIAL PRIMARY KEY,
+
+    nome_regiao VARCHAR(100) NOT NULL UNIQUE,
+    
+    area_regiao GEOMETRY(Polygon, 4326) NOT NULL
+);
+
+-- Pontos de onibus
+
+CREATE TABLE pontos_onibus(
+    id BIGINT PRIMARY KEY,
+    ponto GEOMETRY(Point, 4326) NOT NULL
+);

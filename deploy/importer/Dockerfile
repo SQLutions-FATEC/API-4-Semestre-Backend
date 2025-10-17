@@ -13,6 +13,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the import script 
 COPY entrypoint.sh .
 COPY import_data.py .
+COPY linestring.py .
+COPY pontos_Onibus.py .
+COPY regioes.py .
+COPY update_ende.py .
+
+# Copy any other necessary files
+
+COPY dados_com_linhas.csv .
+COPY pontos_onibus.json .
+COPY arquivos_regioes /app/arquivos_regioes
 
 # The command to run when the container starts
 RUN chmod +x entrypoint.sh
