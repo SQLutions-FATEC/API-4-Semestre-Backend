@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
+import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.service.ReadingService;
 
 @RestController
@@ -28,7 +29,7 @@ public class ReadingController {
     private ReadingService readingService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Reading>> getAllReadings() {
+    public ResponseEntity<List<ReadingInformation>> getAllReadings() {
         return ResponseEntity.ok(readingService.getAllReadings());
     }
 
@@ -55,47 +56,51 @@ public class ReadingController {
     }
 
     @GetMapping // get readings from last minutes
-    public ResponseEntity<List<Reading>> getReadingsFromLastMinutes(@RequestParam(defaultValue = "1") int minutes,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            java.time.LocalDateTime timestamp) {
-        System.out.println(timestamp);
-        return ResponseEntity.ok(readingService.getReadingsFromLastMinutes(minutes, timestamp));
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutes(
+            @RequestParam(defaultValue = "1") int minutes,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime timestamp) {
+        List<ReadingInformation> readings = readingService.getReadingsFromLastMinutes(minutes, timestamp);
+        for (ReadingInformation info : readings) {
+            info.setReadings(null);
+        }
+        return ResponseEntity.ok(readings);
     }
 
     @GetMapping("/address")
-    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByAddress(@RequestBody String[] address,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddress(@RequestBody List<String> address,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        return ResponseEntity.ok(readingService.getReadingsFromLastMinutesByAddress(address, minutes, timestamp));
+                System.out.println("QUE");
+                System.out.println(address);
+        List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByAddress(address, minutes,
+                timestamp);
+        for (ReadingInformation info : readings) {
+            info.setReadings(null);
+        }
+        return ResponseEntity.ok(readings);
     }
 
     @GetMapping("/address/region")
-    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByAddressRegion(@RequestBody String[] region,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddressRegion(
+            @RequestBody List<String> regions,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        return ResponseEntity.ok(readingService.getReadingsFromLastMinutesByAddressRegion(region, minutes, timestamp));
+        List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByAddressRegion(regions, minutes,
+                timestamp);
+        for (ReadingInformation info : readings) {
+            info.setReadings(null);
+        }
+        return ResponseEntity.ok(readings);
     }
 
     @GetMapping("/radar")
-    public ResponseEntity<List<Reading>> getReadingsFromLastMinutesByRadar(@RequestBody Radar[] radar,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByRadar(@RequestBody List<Radar> radar,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        return ResponseEntity.ok(readingService.getReadingsFromLastMinutesByRadar(radar, minutes, timestamp));
+        List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByRadar(radar, minutes, timestamp);
+        for (ReadingInformation info : readings) {
+            info.setReadings(null);
+        }
+        return ResponseEntity.ok(readings);
     }
-
-    @GetMapping("/percentage-types")
-    public ResponseEntity<List<Object[]>> getReadingVehicleTypes(@RequestParam(defaultValue = "1") int minutes,
-            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-        // essa função deve retornar uma série de dados para um gráfico de pizza
-        // representando a porcentagem de cada tipo de veículo nas leituras
-        // SELECT tip_vei, COUNT(*) FROM leitura GROUP BY tip_vei;
-        // e depois mapear o resultado para o formato desejado
-
-        // retorno (que eu me lembre): {["carro", "moto", "caminhão"], [1, 2, 3], [[12,
-        // 13, 14], [30, 40, 50], [20, 25, 30]]}
-        List<Object[]> results = readingService.getReadingVehicleTypes(minutes, timestamp);
-        return ResponseEntity.ok(results);
-    }
-
 }

@@ -1,6 +1,8 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,13 +12,53 @@ import org.springframework.web.server.ResponseStatusException;
 import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
+import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
 
+/**
+ * Implementação do serviço responsável pelo cálculo dos índices de segurança e tráfego
+ * com base nas leituras de velocidade dos radares.
+ * 
+ * <p>
+ * Esta classe fornece métodos para calcular diferentes tipos de índices (segurança, tráfego,
+ * índices por radar, região e cidade) a partir de listas de leituras ({@link Reading}).
+ * Os índices são utilizados para avaliar as condições de segurança viária e fluxo de tráfego
+ * em diferentes contextos e intervalos de tempo.
+ * </p>
+ * 
+ * <p>
+ * Principais funcionalidades:
+ * <ul>
+ *   <li>Cálculo do índice de segurança, considerando a porcentagem de veículos acima do limite e o excesso médio de velocidade.</li>
+ *   <li>Cálculo do índice de tráfego, levando em conta a densidade de leituras por minuto e a velocidade relativa dos veículos.</li>
+ *   <li>Geração de índices agregados para cidade, regiões ou radares específicos, em intervalos de tempo definidos.</li>
+ *   <li>Agrupamento de leituras para análise temporal e geração de séries históricas de índices.</li>
+ * </ul>
+ * </p>
+ * 
+ * <p>
+ * Os índices variam de 1 a 5, onde valores menores indicam melhores condições de segurança e tráfego.
+ * </p>
+ * 
+ * <p>
+ * Pontos de melhoria futuros:
+ * <ul>
+ *   <li>Considerar horários de pico e capacidade máxima dos radares para refinar o cálculo dos índices.</li>
+ *   <li>Implementar métodos para geração de séries temporais dos índices.</li>
+ * </ul>
+ * </p>
+ * 
+ * @author Gabriel Vasconcelos
+ * @see IndexService
+ */
 @Service
 public class IndexServiceImpl implements IndexService {
 
     @Autowired
     private ReadingRepository readingRepository;
+
+    @Autowired
+    private ReadingService readingService;
 
     /**
      * Calcula o índice de segurança com base em uma lista de leituras de
@@ -61,16 +103,50 @@ public class IndexServiceImpl implements IndexService {
                 .average()
                 .orElse(0.0);
         System.out.println("Average excess: " + averageExcess);
-        
+
         Float rawIndex = ((percentageOverLimit * overLimitWeight) + (averageExcess.floatValue() * averageExcessWeight))
                 / (overLimitWeight + averageExcessWeight);
         System.out.println("Raw index: " + rawIndex + "%");
         Integer index = Math.round(1 + 4 * (rawIndex / 100)); // mapear para 1-5
         return index;
     }
-
+    
+    // TODO: apresentar pontos futuros:
+    // considerar o pico do radar como limite para densidade (comparar ao valor de
+    // D):
+    // quanto mais perto do pico do radar, pior o índice.
+    // considerar também o horário do dia (ex: 7-9 e 17-19 são piores)
+    /**
+     * Calcula o índice de tráfego com base em uma lista de leituras de velocidade.
+     *
+     * <p>
+     * O índice é determinado a partir dos seguintes critérios:
+     * <ul>
+     *   <li>Primeiro, calcula a duração total das leituras (diferença entre a última e a primeira leitura).</li>
+     *   <li>Em seguida, calcula a média de leituras por minuto.</li>
+     *   <li>Calcula a velocidade relativa, que é a razão entre a média das velocidades registradas e a velocidade regulamentada do radar, em porcentagem.</li>
+     *   <li>Classifica o índice de tráfego (I_traf) conforme as regras:
+     *     <ul>
+     *       <li>I_traf = 1, se leituras por minuto &lt; 100 e velocidade relativa &gt; 70%</li>
+     *       <li>I_traf = 2, se 100 ≤ leituras por minuto &lt; 300 e velocidade relativa &gt; 60%</li>
+     *       <li>I_traf = 3, se 300 ≤ leituras por minuto &lt; 600 ou 40% ≤ velocidade relativa ≤ 60%</li>
+     *       <li>I_traf = 4, se leituras por minuto ≥ 600 ou 30% ≤ velocidade relativa &lt; 40%</li>
+     *       <li>I_traf = 5, se velocidade relativa &lt; 30%</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     *
+     * <p>
+     * Pontos futuros a serem considerados:
+     * <ul>
+     *   <li>Considerar o pico do radar como limite para densidade, comparando ao valor de leituras por minuto.</li>
+     *   <li>Considerar também o horário do dia (ex: 7-9 e 17-19 são horários de pico).</li>
+     * </ul>
+     *
+     * @param readings Lista de leituras de velocidade.
+     * @return Índice de tráfego calculado (1 a 5).
+     */
     private Integer getTrafficIndex(List<Reading> readings) {
-        // primeiro, pegar a duração total das leituras (última leitura - primeira leitura)
         java.time.LocalDateTime maxDate = readings.stream()
                 .map(Reading::getDate)
                 .max(java.time.LocalDateTime::compareTo)
@@ -81,13 +157,13 @@ public class IndexServiceImpl implements IndexService {
                 .orElse(java.time.LocalDateTime.now());
         java.time.Duration readingLength = java.time.Duration.between(minDate, maxDate);
         float readingLengthMinutes = readingLength.toSeconds() / 60.0f;
+        System.out.println("Reading start: " + minDate);
+        System.out.println("Reading end: " + maxDate);
         System.out.println("Reading length: " + readingLengthMinutes + " minutes");
-        // depois, calcular a média de leituras por minuto
+
         Float averageReadingsPerMinute = readings.size() / (readingLengthMinutes == 0 ? 1 : readingLengthMinutes);
         System.out.println("Average readings per minute: " + averageReadingsPerMinute);
 
-        // calcular a velocidade relativa (média de velocidade / velocidade
-        // regulamentada) (%)
         Float averageSpeed = (float) readings.stream()
                 .mapToInt(Reading::getSpeed)
                 .average()
@@ -99,18 +175,7 @@ public class IndexServiceImpl implements IndexService {
         Float relativeSpeed = (averageSpeed / averageRegulatedSpeed) * 100;
         System.out.println("Relative speed: " + relativeSpeed + "%");
 
-        // classificar o índice:
-        // I_traf = 1, se D < 100 e V_rel > 70
-        // I_traf = 2, se 100 <= D < 300 e V_rel > 60
-        // I_traf = 3, se 300 <= D < 600 ou 40 <= V_rel <= 60
-        // I_traf = 4, se 600 <= D ou 30 <= V_rel < 40
-        // I_traf = 5, se V_rel < 30
-        
-        // TODO: apresentar pontos futuros:
-        // considerar o pico do radar como limite para densidade (comparar ao valor de D):
-        // quanto mais perto do pico do radar, pior o índice.
-        // considerar também o horário do dia (ex: 7-9 e 17-19 são piores)
-        
+
         Integer index;
         if (averageReadingsPerMinute < 100 && relativeSpeed > 70) {
             index = 1;
@@ -169,15 +234,40 @@ public class IndexServiceImpl implements IndexService {
         return index;
     }
 
+    /**
+     * Calcula uma lista de objetos {@link Index} a partir de uma lista de objetos {@link Reading}.
+     * <p>
+     * Este método primeiro valida a lista de leituras recebida, garantindo que não seja nula,
+     * não esteja vazia e contenha pelo menos duas leituras. Em seguida, agrupa as leituras usando o
+     * método {@code readingService.groupReadings} e, para cada grupo, calcula os índices de tráfego e segurança.
+     * Os objetos {@link Index} resultantes são criados com os valores calculados e o intervalo de datas de cada grupo.
+     * </p>
+     *
+     * @param readings a lista de objetos {@link Reading} a ser processada
+     * @return uma lista de objetos {@link Index}, cada um representando os índices calculados para um grupo de leituras
+     * @throws ResponseStatusException se a lista de leituras for nula, vazia ou contiver menos de duas leituras
+     */
     @Override
-    public Index getIndexFromReadings(List<Reading> readings) {
+    public List<Index> getIndexesWithGroupedReadings(List<Reading> readings) {
         if (readings == null || readings.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Readings list is null or empty");
         }
-        Integer trafficIndex = getTrafficIndex(readings);
-        Integer securityIndex = getSecurityIndex(readings);
 
-        return new Index(securityIndex, trafficIndex);
+        if (readings.size() < 2) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not enough readings to calculate index");
+        }
+
+        System.out.println("Calculating indexes from readings");
+        List<ReadingInformation> groupedReadings = readingService.groupReadings(readings);
+        for (ReadingInformation info : groupedReadings) {
+            info.setIndex(getIndexFromReadings(info.getReadings()));
+        }
+        List<Index> output = groupedReadings.stream()
+                .map(ReadingInformation::getIndex)
+                .collect(Collectors.toList());
+        System.out.println("Calculated " + output.size() + " groups from readings");
+
+        return output;
     }
 
     @Override
@@ -189,12 +279,11 @@ public class IndexServiceImpl implements IndexService {
         List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
 
-        Index index = getIndexFromReadings(readings);
-        return index;
+        return getIndexFromReadings(readings);
     }
 
     @Override
-    public Index getRegionIndexes(int minutes, String region, java.time.LocalDateTime timestamp) {
+    public Index getRegionIndex(int minutes, String region, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
@@ -204,9 +293,41 @@ public class IndexServiceImpl implements IndexService {
                 timeEnd);
         System.out.println("Reading count: " + readings.size());
 
-        Index index = getIndexFromReadings(readings);
+        return getIndexFromReadings(readings);
+    }
 
-        return index;
+    @Override
+    public Index getIndexFromReadings(List<Reading> readings) {
+        if (readings == null || readings.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Readings list is null or empty");
+        }
+        Integer trafficIndex = getTrafficIndex(readings);
+        Integer securityIndex = getSecurityIndex(readings);
+
+        return new Index(securityIndex, trafficIndex, readings.get(0).getDate(),
+                readings.get(readings.size() - 1).getDate());
+    }
+
+    @Override
+    public List<Index> getCityIndexSeries(int minutes, LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        System.out.println("Calculating city index series for time range: " + timeStart + " to " + timeEnd);
+        List<Reading> readings = readingRepository.findByDateBetween(timeStart, timeEnd);
+        System.out.println("Reading count: " + readings.size());
+        return getIndexesWithGroupedReadings(readings);
+    }
+
+    @Override
+    public List<Index> getRadarIndexesSeries(int minutes, Radar[] radars, LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        System.out.println("Calculating radar index series for time range: " + timeStart + " to " + timeEnd);
+
+        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
+        System.out.println("Reading count: " + readings.size());
+
+        return getIndexesWithGroupedReadings(readings);
     }
 
     @Override
@@ -223,4 +344,18 @@ public class IndexServiceImpl implements IndexService {
 
         return index;
     }
+
+    @Override
+    public List<Index> getRegionIndexSeries(int minutes, String region, LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        System.out.println("Calculating region index series for time range: " + timeStart + " to " + timeEnd);
+
+        List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(List.of(region), timeStart,
+                timeEnd);
+        System.out.println("Reading count: " + readings.size());
+
+        return getIndexesWithGroupedReadings(readings);
+    }
+
 }

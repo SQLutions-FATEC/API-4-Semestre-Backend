@@ -35,4 +35,7 @@ public interface ReadingRepository extends JpaRepository<Reading, Integer> {
 
     List<Reading> findByRadarAddressRegionInAndDateBetween(List<String> region, LocalDateTime startTime,
             LocalDateTime endTime);
+
+    List<Reading> findByRadarAddressInAndDateBetween(List<String> address, LocalDateTime startTime,
+            LocalDateTime endTime);
 }
