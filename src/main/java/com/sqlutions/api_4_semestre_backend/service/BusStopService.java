@@ -14,7 +14,6 @@ public interface BusStopService {
 
     // Create / Update
     // Se o ID for null ou não existir, cria; se existir, atualiza.
-    BusStop saveBusStop(BusStop busStop);
 
     // Delete
     void deleteBusStop(Long id);
