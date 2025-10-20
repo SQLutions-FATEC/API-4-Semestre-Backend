@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.Polygon;
 
 @Entity
 @Table(name = "regioes")
-public class Regions {
+public class Region {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class Regions {
     private Polygon areaRegiao;
 
     // Construtores
-    public Regions() {
+    public Region() {
     }
 
     // --- Getters e Setters ---
