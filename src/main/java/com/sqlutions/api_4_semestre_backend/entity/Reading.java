@@ -18,7 +18,7 @@ public class Reading {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_rad")
     private Radar radar;
 
