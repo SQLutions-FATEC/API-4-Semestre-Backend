@@ -1,6 +1,7 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,10 @@ import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
+import com.sqlutions.api_4_semestre_backend.entity.Region;
+import com.sqlutions.api_4_semestre_backend.entity.RegionMap;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
+import com.sqlutions.api_4_semestre_backend.repository.RegionRepository;
 
 /**
  * Implementação do serviço responsável pelo cálculo dos índices de segurança e tráfego
@@ -56,6 +60,9 @@ public class IndexServiceImpl implements IndexService {
 
     @Autowired
     private ReadingRepository readingRepository;
+
+    @Autowired
+    private RegionRepository regionRepository;
 
     @Autowired
     private ReadingService readingService;
@@ -295,6 +302,32 @@ public class IndexServiceImpl implements IndexService {
 
         return getIndexFromReadings(readings);
     }
+
+
+    @Override
+    public List<RegionMap> getRegionsIndex(int minutes, java.time.LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
+
+        List<RegionMap> regionMaps = new ArrayList<>();
+        List<Region> regions = regionRepository.findAllRegions();
+
+        for (Region region : regions) {
+            RegionMap regionMap = new RegionMap("", region.getAreaRegiao(), 0, 0, 0);
+            regionMap.setRegionName(region.getNomeRegiao());
+            List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(
+                    List.of(region.getNomeRegiao()), timeStart, timeEnd);
+            regionMap.setTrafficIndex(getTrafficIndex(readings));
+            regionMap.setSecurityIndex(getSecurityIndex(readings));
+            Integer overallIndex = Math.round((regionMap.getTrafficIndex() + regionMap.getSecurityIndex()) / 2.0f);
+            regionMap.setOverallIndex(overallIndex);
+            regionMaps.add(regionMap);
+        }
+
+        return regionMaps;
+    }
+
 
     @Override
     public Index getIndexFromReadings(List<Reading> readings) {
