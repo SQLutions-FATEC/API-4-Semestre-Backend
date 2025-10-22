@@ -318,10 +318,17 @@ public class IndexServiceImpl implements IndexService {
             regionMap.setRegionName(region.getNomeRegiao());
             List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(
                     List.of(region.getNomeRegiao()), timeStart, timeEnd);
-            regionMap.setTrafficIndex(getTrafficIndex(readings));
-            regionMap.setSecurityIndex(getSecurityIndex(readings));
-            Integer overallIndex = Math.round((regionMap.getTrafficIndex() + regionMap.getSecurityIndex()) / 2.0f);
-            regionMap.setOverallIndex(overallIndex);
+            if (readings.isEmpty()) {
+                regionMap.setTrafficIndex(1);
+                regionMap.setSecurityIndex(1);
+                regionMap.setOverallIndex(1);
+            }
+            else {
+                regionMap.setTrafficIndex(getTrafficIndex(readings));
+                regionMap.setSecurityIndex(getSecurityIndex(readings));
+                Integer overallIndex = Math.round((regionMap.getTrafficIndex() + regionMap.getSecurityIndex()) / 2.0f);
+                regionMap.setOverallIndex(overallIndex);
+            }
             regionMaps.add(regionMap);
         }
 
