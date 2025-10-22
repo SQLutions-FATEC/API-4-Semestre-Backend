@@ -3,7 +3,9 @@ package com.sqlutions.api_4_semestre_backend.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sqlutions.api_4_semestre_backend.entity.Region;
 import com.sqlutions.api_4_semestre_backend.repository.RegionRepository;
@@ -22,7 +24,7 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public Region searchRegionById(Long id) {
         return regionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Região não encontrada."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Região não encontrada."));
     }
 
     @Override
