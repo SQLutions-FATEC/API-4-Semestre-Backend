@@ -1,5 +1,7 @@
 package com.sqlutions.api_4_semestre_backend.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +15,7 @@ import com.sqlutions.api_4_semestre_backend.service.IndexService;
 import com.sqlutions.api_4_semestre_backend.service.TimeService;
 
 @RestController
-@RequestMapping("/indexes")
+@RequestMapping("/index")
 public class IndexController {
         @Autowired
         IndexService indexService;
@@ -37,9 +39,39 @@ public class IndexController {
         }
 
         @GetMapping("/region")
-        public Index getRegionIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestBody String region,
+        public Index getRegionIndex(@RequestParam(defaultValue = "1") int minutes, @RequestBody String region,
                         @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-                return indexService.getRegionIndexes(minutes, region,
+                return indexService.getRegionIndex(minutes, region,
+                                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+        }
+
+        @GetMapping("/series")
+        public List<Index> getCityIndexSeries(@RequestParam(defaultValue = "1") int minutes,
+                        @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+                return indexService.getCityIndexSeries(minutes,
+                                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+        }
+
+        @GetMapping("/radar/series")
+        public List<Index> getRadarIndexesSeries(@RequestParam(defaultValue = "1") int minutes,
+                        @RequestBody Radar[] radars,
+                        @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+                return indexService.getRadarIndexesSeries(minutes, radars,
+                                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+        }
+
+        @GetMapping("/region/series")
+        public List<Index> getRegionIndexSeries(@RequestParam(defaultValue = "1") int minutes,
+                        @RequestBody String region,
+                        @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+                return indexService.getRegionIndexSeries(minutes, region,
+                                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
+        }
+
+        @GetMapping("/address")
+        public Index getAddressIndexes(@RequestParam(defaultValue = "1") int minutes, @RequestParam String address,
+                        @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+                return indexService.getAddressIndexes(minutes, address,
                                 timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
         }
 }
