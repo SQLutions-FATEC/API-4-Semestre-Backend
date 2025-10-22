@@ -2,6 +2,7 @@ package com.sqlutions.api_4_semestre_backend.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -220,6 +221,7 @@ public class IndexServiceImpl implements IndexService {
      * @return valor inteiro representando o índice da cidade (1 a 5, onde menor é
      *         melhor)
      */
+    @Override  
     public Index getCityIndex(int minutes, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
@@ -308,13 +310,14 @@ public class IndexServiceImpl implements IndexService {
     public List<RegionMap> getRegionsIndex(int minutes, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        java.time.LocalDateTime timeStartHour = timeEnd.minusMinutes(60);
         System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
 
         List<RegionMap> regionMaps = new ArrayList<>();
         List<Region> regions = regionRepository.findAllRegions();
 
         for (Region region : regions) {
-            RegionMap regionMap = new RegionMap("", region.getAreaRegiao(), 0, 0, 0);
+            RegionMap regionMap = new RegionMap("", region.getAreaRegiao(), 0, 0, 0, new HashMap<>());
             regionMap.setRegionName(region.getNomeRegiao());
             List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(
                     List.of(region.getNomeRegiao()), timeStart, timeEnd);
@@ -329,6 +332,13 @@ public class IndexServiceImpl implements IndexService {
                 Integer overallIndex = Math.round((regionMap.getTrafficIndex() + regionMap.getSecurityIndex()) / 2.0f);
                 regionMap.setOverallIndex(overallIndex);
             }
+            List<Reading> readingsHour = readingRepository.findByRadarAddressRegionInAndDateBetween(
+                    List.of(region.getNomeRegiao()), timeStartHour, timeEnd);
+            for (Reading reading : readingsHour) {
+                String type = reading.getVehicleType();
+                regionMap.getVehicleTypeCounts().put(type, regionMap.getVehicleTypeCounts().getOrDefault(type, 0) + 1);
+            }
+
             regionMaps.add(regionMap);
         }
 
