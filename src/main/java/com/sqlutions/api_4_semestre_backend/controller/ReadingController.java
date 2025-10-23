@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.service.ReadingService;
@@ -94,7 +93,7 @@ public class ReadingController {
     }
 
     @GetMapping("/radar")
-    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByRadar(@RequestBody List<Radar> radar,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByRadar(@RequestParam List<String> radar,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByRadar(radar, minutes, timestamp);

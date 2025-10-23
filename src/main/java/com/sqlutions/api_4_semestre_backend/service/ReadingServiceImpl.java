@@ -86,9 +86,9 @@ public class ReadingServiceImpl implements ReadingService {
     }
 
     @Override
-    public List<ReadingInformation> getReadingsFromLastMinutesByRadar(List<Radar> radar, int minutes,
+    public List<ReadingInformation> getReadingsFromLastMinutesByRadar(List<String> radarIds, int minutes,
             @Nullable java.time.LocalDateTime startDate) {
-        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(radar,
+        List<Reading> readings = readingRepository.findByRadarIdInAndDateBetween(radarIds,
                 (startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase()).minusMinutes(minutes),
                 startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase());
         return groupReadings(readings);

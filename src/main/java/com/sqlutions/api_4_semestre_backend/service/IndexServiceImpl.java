@@ -1,6 +1,8 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,10 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sqlutions.api_4_semestre_backend.entity.Index;
-import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
+import com.sqlutions.api_4_semestre_backend.entity.Region;
+import com.sqlutions.api_4_semestre_backend.entity.RegionMap;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
+import com.sqlutions.api_4_semestre_backend.repository.RegionRepository;
 
 /**
  * Implementação do serviço responsável pelo cálculo dos índices de segurança e tráfego
@@ -56,6 +60,9 @@ public class IndexServiceImpl implements IndexService {
 
     @Autowired
     private ReadingRepository readingRepository;
+
+    @Autowired
+    private RegionRepository regionRepository;
 
     @Autowired
     private ReadingService readingService;
@@ -213,6 +220,7 @@ public class IndexServiceImpl implements IndexService {
      * @return valor inteiro representando o índice da cidade (1 a 5, onde menor é
      *         melhor)
      */
+    @Override  
     public Index getCityIndex(int minutes, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
@@ -271,12 +279,12 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public Index getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp) {
+    public Index getRadarIndexes(int minutes, String[] radars, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating radar index for time range: " + timeStart + " to " + timeEnd);
 
-        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
+        List<Reading> readings = readingRepository.findByRadarIdInAndDateBetween(List.of(radars), timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
 
         return getIndexFromReadings(readings);
@@ -295,6 +303,47 @@ public class IndexServiceImpl implements IndexService {
 
         return getIndexFromReadings(readings);
     }
+
+
+    @Override
+    public List<RegionMap> getRegionsIndex(int minutes, java.time.LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+        java.time.LocalDateTime timeStartHour = timeEnd.minusMinutes(60);
+        System.out.println("Calculating region index for time range: " + timeStart + " to " + timeEnd);
+
+        List<RegionMap> regionMaps = new ArrayList<>();
+        List<Region> regions = regionRepository.findAllRegions();
+
+        for (Region region : regions) {
+            RegionMap regionMap = new RegionMap("", region.getAreaRegiao(), 0, 0, 0, new HashMap<>());
+            regionMap.setRegionName(region.getNomeRegiao());
+            List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(
+                    List.of(region.getNomeRegiao()), timeStart, timeEnd);
+            if (readings.isEmpty()) {
+                regionMap.setTrafficIndex(1);
+                regionMap.setSecurityIndex(1);
+                regionMap.setOverallIndex(1);
+            }
+            else {
+                regionMap.setTrafficIndex(getTrafficIndex(readings));
+                regionMap.setSecurityIndex(getSecurityIndex(readings));
+                Integer overallIndex = Math.round((regionMap.getTrafficIndex() + regionMap.getSecurityIndex()) / 2.0f);
+                regionMap.setOverallIndex(overallIndex);
+            }
+            List<Reading> readingsHour = readingRepository.findByRadarAddressRegionInAndDateBetween(
+                    List.of(region.getNomeRegiao()), timeStartHour, timeEnd);
+            for (Reading reading : readingsHour) {
+                String type = reading.getVehicleType();
+                regionMap.getVehicleTypeCounts().put(type, regionMap.getVehicleTypeCounts().getOrDefault(type, 0) + 1);
+            }
+
+            regionMaps.add(regionMap);
+        }
+
+        return regionMaps;
+    }
+
 
     @Override
     public Index getIndexFromReadings(List<Reading> readings) {
@@ -319,12 +368,12 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public List<Index> getRadarIndexesSeries(int minutes, Radar[] radars, LocalDateTime timestamp) {
+    public List<Index> getRadarIndexesSeries(int minutes, String[] radars, LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating radar index series for time range: " + timeStart + " to " + timeEnd);
 
-        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
+        List<Reading> readings = readingRepository.findByRadarIdInAndDateBetween(List.of(radars), timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
 
         return getIndexesWithGroupedReadings(readings);
