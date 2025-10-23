@@ -1,6 +1,5 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,18 +94,22 @@ public class IndexServiceImpl implements IndexService {
      *         maior segurança.
      */
     private Integer getSecurityIndex(List<Reading> readings) {
-        long totalReadings = readings.size();
-        if (totalReadings == 0)
+        // dada uma lista de leituras, calcular a porcentagem de carros que estão
+        // acima da velocidade máxima
+        Long totalReadings = (long) readings.size();
+        System.out.println(totalReadings);
+        if (totalReadings == 0) {
             return 1;
+        }
+        Long nOverLimit = readings.stream().filter(r -> r.getSpeed() > r.getRadar().getRegulatedSpeed()).count();
+        Float overLimitWeight = 0.4f; // peso da porcentagem de carros acima do limite
+        Float averageExcessWeight = 0.6f; // peso da média de excesso de velocidade
+        Float percentageOverLimit = (nOverLimit * 100f) / totalReadings;
+        System.out.println(nOverLimit + " / " + totalReadings + " = " + percentageOverLimit);
 
-        long nOverLimit = readings.stream()
+        Double averageExcess = readings.stream()
                 .filter(r -> r.getSpeed() > r.getRadar().getRegulatedSpeed())
-                .count();
-
-        float percentageOverLimit = (nOverLimit * 100f) / totalReadings;
-        double averageExcess = readings.stream()
-                .filter(r -> r.getSpeed() > r.getRadar().getRegulatedSpeed())
-                .mapToDouble(r -> r.getSpeed() - r.getRadar().getRegulatedSpeed())
+                .mapToLong(r -> r.getSpeed() - r.getRadar().getRegulatedSpeed())
                 .average()
                 .orElse(0.0);
         System.out.println("Average excess: " + averageExcess);
@@ -165,15 +168,13 @@ public class IndexServiceImpl implements IndexService {
     private Integer getTrafficIndex(List<Reading> readings) {
         java.time.LocalDateTime maxDate = readings.stream()
                 .map(Reading::getDate)
-                .max(LocalDateTime::compareTo)
-                .orElse(LocalDateTime.now());
-
-        LocalDateTime minDate = readings.stream()
+                .max(java.time.LocalDateTime::compareTo)
+                .orElse(java.time.LocalDateTime.now());
+        java.time.LocalDateTime minDate = readings.stream()
                 .map(Reading::getDate)
-                .min(LocalDateTime::compareTo)
-                .orElse(LocalDateTime.now());
-
-        Duration readingLength = Duration.between(minDate, maxDate);
+                .min(java.time.LocalDateTime::compareTo)
+                .orElse(java.time.LocalDateTime.now());
+        java.time.Duration readingLength = java.time.Duration.between(minDate, maxDate);
         float readingLengthMinutes = readingLength.toSeconds() / 60.0f;
         System.out.println("Reading start: " + minDate);
         System.out.println("Reading end: " + maxDate);
@@ -186,11 +187,12 @@ public class IndexServiceImpl implements IndexService {
                 .mapToInt(Reading::getSpeed)
                 .average()
                 .orElse(0.0);
-        float avgRegSpeed = (float) readings.stream()
+        Float averageRegulatedSpeed = (float) readings.stream()
                 .mapToInt(r -> r.getRadar().getRegulatedSpeed())
                 .average()
                 .orElse(0.0);
-        float relativeSpeed = avgRegSpeed == 0 ? 0 : (avgSpeed / avgRegSpeed) * 100;
+        Float relativeSpeed = (averageSpeed / averageRegulatedSpeed) * 100;
+        System.out.println("Relative speed: " + relativeSpeed + "%");
 
         Integer index;
         if (averageReadingsPerMinute < 100 && relativeSpeed > 70) {
@@ -212,19 +214,22 @@ public class IndexServiceImpl implements IndexService {
      * Calcula o índice geral da cidade para um determinado intervalo de tempo.
      * <p>
      * Esta função agrega diversos índices (por exemplo, tráfego, segurança) com
-     * base nas leituras coletadas entre {@code timestamp - minutes} e
-     * {@code timestamp}.
-     * O índice resultante representa o status geral da cidade, onde valores menores
-     * indicam melhores condições.
+     * base nas leituras
+     * coletadas entre {@code timestamp - minutes} e {@code timestamp}. O índice
+     * resultante
+     * representa o status geral da cidade, onde valores menores indicam melhores
+     * condições.
      * <p>
-     * Atualmente, o cálculo é baseado nos índices de tráfego e segurança,
-     * determinados pela análise das leituras no período especificado.
+     * Atualmente, o cálculo é baseado no índice de segurança, determinado pela
+     * análise
+     * da porcentagem de veículos que excederam o limite de velocidade no período
+     * especificado.
      * 
-     * @param minutes   Número de minutos a considerar a partir do timestamp
-     *                  informado.
-     * @param timestamp Fim do intervalo de tempo para o cálculo do índice.
-     * @return Valor inteiro representando o índice da cidade (1 a 5, onde menor é
-     *         melhor).
+     * @param minutes   número de minutos a considerar a partir do timestamp
+     *                  informado
+     * @param timestamp fim do intervalo de tempo para o cálculo do índice
+     * @return valor inteiro representando o índice da cidade (1 a 5, onde menor é
+     *         melhor)
      */
     public Index getCityIndex(int minutes, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
@@ -270,7 +275,7 @@ public class IndexServiceImpl implements IndexService {
     @Override
     public List<Index> getIndexesWithGroupedReadings(List<Reading> readings) {
         if (readings == null || readings.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A lista de leituras está vazia ou nula.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Readings list is null or empty");
         }
 
         if (readings.size() < 2) {
