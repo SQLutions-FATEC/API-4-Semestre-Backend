@@ -25,10 +25,8 @@ public class IndexController {
         @GetMapping
         public Index getCityIndex(@RequestParam(defaultValue = "1") int minutes,
                         @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-                java.time.LocalDateTime effectiveTime = (timestamp != null)
-                                ? timestamp
-                                : java.time.LocalDateTime.now(); // usa o tempo local, não o banco
-                return indexService.getCityIndex(minutes, effectiveTime);
+                return indexService.getCityIndex(minutes,
+                                timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
         }
 
         @GetMapping("/radar")
