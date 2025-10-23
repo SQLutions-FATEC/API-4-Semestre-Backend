@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sqlutions.api_4_semestre_backend.entity.Index;
-import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.entity.Region;
@@ -280,12 +279,12 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public Index getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp) {
+    public Index getRadarIndexes(int minutes, String[] radars, java.time.LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating radar index for time range: " + timeStart + " to " + timeEnd);
 
-        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
+        List<Reading> readings = readingRepository.findByRadarIdInAndDateBetween(List.of(radars), timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
 
         return getIndexFromReadings(readings);
@@ -369,12 +368,12 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public List<Index> getRadarIndexesSeries(int minutes, Radar[] radars, LocalDateTime timestamp) {
+    public List<Index> getRadarIndexesSeries(int minutes, String[] radars, LocalDateTime timestamp) {
         java.time.LocalDateTime timeEnd = timestamp;
         java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculating radar index series for time range: " + timeStart + " to " + timeEnd);
 
-        List<Reading> readings = readingRepository.findByRadarInAndDateBetween(List.of(radars), timeStart, timeEnd);
+        List<Reading> readings = readingRepository.findByRadarIdInAndDateBetween(List.of(radars), timeStart, timeEnd);
         System.out.println("Reading count: " + readings.size());
 
         return getIndexesWithGroupedReadings(readings);

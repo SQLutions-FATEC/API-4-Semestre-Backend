@@ -3,7 +3,6 @@ package com.sqlutions.api_4_semestre_backend.service;
 import java.util.List;
 
 import com.sqlutions.api_4_semestre_backend.entity.Index;
-import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.entity.RegionMap;
 
@@ -12,7 +11,7 @@ public interface IndexService {
     Index getCityIndex(int minutes, java.time.LocalDateTime timestamp);
 
     // pegar o nível atual de um radar
-    Index getRadarIndexes(int minutes, Radar[] radars, java.time.LocalDateTime timestamp);
+    Index getRadarIndexes(int minutes, String[] radars, java.time.LocalDateTime timestamp);
 
     // pegar o nível atual de uma região
     Index getRegionIndex(int minutes, String region, java.time.LocalDateTime timestamp);
@@ -30,7 +29,7 @@ public interface IndexService {
     List<Index> getCityIndexSeries(int minutes, java.time.LocalDateTime timestamp);
 
     // pegar séries temporais de índices de radares
-    List<Index> getRadarIndexesSeries(int minutes, Radar[] radars, java.time.LocalDateTime timestamp);
+    List<Index> getRadarIndexesSeries(int minutes, String[] radars, java.time.LocalDateTime timestamp);
 
     // pegar séries temporais de índices de regiões
     List<Index> getRegionIndexSeries(int minutes, String region, java.time.LocalDateTime timestamp);
