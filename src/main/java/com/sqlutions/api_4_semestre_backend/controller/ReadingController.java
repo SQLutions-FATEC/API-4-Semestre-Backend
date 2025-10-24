@@ -66,7 +66,7 @@ public class ReadingController {
     }
 
     @GetMapping("/address")
-    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddress(@RequestBody List<String> address,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddress(@RequestParam List<String> address,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
                 System.out.println("QUE");
@@ -81,7 +81,7 @@ public class ReadingController {
 
     @GetMapping("/address/region")
     public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddressRegion(
-            @RequestBody List<String> regions,
+            @RequestParam List<String> regions,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
         List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByAddressRegion(regions, minutes,
