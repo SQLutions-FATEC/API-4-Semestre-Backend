@@ -49,7 +49,24 @@ CREATE TABLE usuario (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(100) NOT NULL,
-    nivel nivel_usuario NOT NULL
+    nivel nivel_usuario NOT NULL,
+    canal_notificacao VARCHAR(30) DEFAULT 'email',   --canal preferencial de notificação
+    ultimo_alerta TIMESTAMP,                         --último envio de notificação
+    niveis_interesse VARCHAR(200)                   --niveis de interesse (ex: 'Segurança, Mobilidade')
+);
+
+-- Log de Notificações
+CREATE TABLE log_notificacao (
+    id SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    tipo VARCHAR(50) NOT NULL,       --ex: Segurança, Mobilidade, Infraestrutura
+    mensagem TEXT NOT NULL,                 --conteúdo ou resumo da notificação
+    enviado_em TIMESTAMP DEFAULT NOW(),     --data/hora do envio
+    data_emissao BOOLEAN DEFAULT FALSE,             --indica se o usuário confirmou leitura
+    data_conclusao TIMESTAMP,                      --data/hora da confirmação
+    CONSTRAINT fk_log_usuario FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id)
+        ON DELETE CASCADE
 );
 
 -- Regiões
