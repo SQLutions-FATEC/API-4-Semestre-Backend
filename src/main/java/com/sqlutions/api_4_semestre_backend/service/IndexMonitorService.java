@@ -25,11 +25,12 @@ public class IndexMonitorService {
     private ApplicationEventPublisher eventPublisher;
 
     
+   private TimeService timeService; 
+
     @Scheduled(fixedRate = 300000) 
     public void monitorTrafficAndSecurity() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeService.getCurrentTimeClampedToDatabase();
         LocalDateTime start = now.minusMinutes(10);
-
         List<Reading> readings = readingRepository.findByDateBetween(start, now);
 
         if (readings.isEmpty()) {
