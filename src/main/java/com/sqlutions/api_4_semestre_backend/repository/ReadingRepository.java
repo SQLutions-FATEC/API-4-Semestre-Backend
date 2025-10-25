@@ -24,7 +24,8 @@ public interface ReadingRepository extends JpaRepository<Reading, Integer> {
     List<Reading> findByRadarAddressAddress(String address);
 
     @Query("SELECT r.vehicleType, COUNT(r) FROM Reading r WHERE r.date BETWEEN :start AND :end GROUP BY r.vehicleType")
-    List<Object[]> countReadingsByVehicleTypeDateBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
+    List<Object[]> countReadingsByVehicleTypeDateBetween(java.time.LocalDateTime start,
+            java.time.LocalDateTime end);
 
     List<Reading> findByRadarAddressAddressInAndDateBetween(List<String> address, LocalDateTime startTime,
             LocalDateTime endTime);
@@ -36,5 +37,19 @@ public interface ReadingRepository extends JpaRepository<Reading, Integer> {
             LocalDateTime endTime);
 
     List<Reading> findByRadarAddressInAndDateBetween(List<String> address, LocalDateTime startTime,
+            LocalDateTime endTime);
+
+    List<Reading> findByDateBetweenAndVehicleType(LocalDateTime startTime, LocalDateTime endTime,
+            String vehicleType);
+
+    @Query("SELECT DISTINCT r.vehicleType FROM Reading r WHERE r.date BETWEEN :startTime AND :endTime")
+    List<String> findDistinctVehicleTypesBetweenDates(LocalDateTime startTime, LocalDateTime endTime);
+
+    // Métodos para filtrar por região e tipo de veículo combinados
+    List<Reading> findByRadarAddressRegionInAndDateBetweenAndVehicleType(List<String> regions,
+            LocalDateTime startTime, LocalDateTime endTime, String vehicleType);
+
+    @Query("SELECT DISTINCT r.vehicleType FROM Reading r WHERE r.radar.address.region IN :regions AND r.date BETWEEN :startTime AND :endTime")
+    List<String> findDistinctVehicleTypesByRegionAndDateBetween(List<String> regions, LocalDateTime startTime,
             LocalDateTime endTime);
 }

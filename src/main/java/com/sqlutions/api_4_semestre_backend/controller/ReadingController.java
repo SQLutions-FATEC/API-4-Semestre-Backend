@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
+import com.sqlutions.api_4_semestre_backend.entity.VehicleTypeHourlyData;
 import com.sqlutions.api_4_semestre_backend.service.ReadingService;
 
 @RestController
@@ -66,11 +67,12 @@ public class ReadingController {
     }
 
     @GetMapping("/address")
-    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddress(@RequestBody List<String> address,
+    public ResponseEntity<List<ReadingInformation>> getReadingsFromLastMinutesByAddress(
+            @RequestBody List<String> address,
             @RequestParam(defaultValue = "1") int minutes,
             @RequestParam(required = false) java.time.LocalDateTime timestamp) {
-                System.out.println("QUE");
-                System.out.println(address);
+        System.out.println("QUE");
+        System.out.println(address);
         List<ReadingInformation> readings = readingService.getReadingsFromLastMinutesByAddress(address, minutes,
                 timestamp);
         for (ReadingInformation info : readings) {
@@ -101,5 +103,16 @@ public class ReadingController {
             info.setReadings(null);
         }
         return ResponseEntity.ok(readings);
+    }
+
+    @GetMapping("/hourly-count")
+    public ResponseEntity<List<VehicleTypeHourlyData>> getHourlyVehicleDataByType(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime startTime,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime endTime,
+            @RequestParam(required = false) String vehicleType,
+            @RequestParam(required = false) List<String> regions) {
+        List<VehicleTypeHourlyData> data = readingService.getHourlyVehicleDataByType(startTime, endTime, vehicleType,
+                regions);
+        return ResponseEntity.ok(data);
     }
 }
