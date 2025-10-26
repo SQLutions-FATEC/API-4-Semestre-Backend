@@ -7,6 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Component
@@ -24,7 +25,7 @@ public class HighIndexEventListener {
         int trafficIndex = index.getTrafficIndex();
         int securityIndex = index.getSecurityIndex();
 
-        String timestamp = LocalDateTime.now().format(formatter);
+        String timestamp = LocalDateTime.now(ZoneId.of("America/Sao_Paulo")).format(formatter);
 
         if (trafficIndex >= 3) {
             String message = String.format(
