@@ -9,9 +9,8 @@ CREATE TYPE tipo_veiculo AS ENUM (
     'Moto',
     'Indefinido'
 );
-
 CREATE TYPE nivel_usuario AS ENUM (
-    'Admin',
+    'Admin', 
     'Gestor'
 );
 
@@ -49,38 +48,28 @@ CREATE TABLE usuario (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(100) NOT NULL,
-    nivel nivel_usuario NOT NULL,
-    canal_notificacao VARCHAR(30) DEFAULT 'email',   --canal preferencial de notificação
-    ultimo_alerta TIMESTAMP,                         --último envio de notificação
-    niveis_interesse VARCHAR(200)                   --niveis de interesse (ex: 'Segurança, Mobilidade')
+    nivel nivel_usuario NOT NULL
 );
 
 -- Log de Notificações
 CREATE TABLE log_notificacao (
     id SERIAL PRIMARY KEY,
     id_usuario INT NOT NULL,
-    tipo VARCHAR(50) NOT NULL,       --ex: Segurança, Mobilidade, Infraestrutura
-    mensagem TEXT NOT NULL,                 --conteúdo ou resumo da notificação
-    enviado_em TIMESTAMP DEFAULT NOW(),     --data/hora do envio
-    data_emissao BOOLEAN DEFAULT FALSE,             --indica se o usuário confirmou leitura
-    data_conclusao TIMESTAMP,                      --data/hora da confirmação
-    CONSTRAINT fk_log_usuario FOREIGN KEY (id_usuario)
-        REFERENCES usuario(id)
-        ON DELETE CASCADE
+    titulo VARCHAR(50) NOT NULL,
+    mensagem TEXT NOT NULL,
+    data_emissao TIMESTAMP DEFAULT NOW(),
+    data_conclusao TIMESTAMP,
+    CONSTRAINT fk_log_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
 );
 
 -- Regiões
-
 CREATE TABLE regioes (
     id SERIAL PRIMARY KEY,
-
     nome_regiao VARCHAR(100) NOT NULL UNIQUE,
-    
     area_regiao GEOMETRY(Polygon, 4326) NOT NULL
 );
 
 -- Pontos de onibus
-
 CREATE TABLE pontos_onibus(
     id BIGINT PRIMARY KEY,
     ponto GEOMETRY(Point, 4326) NOT NULL
