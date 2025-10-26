@@ -46,10 +46,15 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.twilio.sdk</groupId>
-			<artifactId>twilio</artifactId>
-			<version>9.3.0</version>
-		</dependency>	
+   			 <groupId>org.telegram</groupId>
+   			<artifactId>telegrambots</artifactId>
+    		<version>6.6.0</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.telegram</groupId>
+    		<artifactId>telegrambots-spring-boot-starter</artifactId>
+    		<version>6.6.0</version>
+		</dependency>		
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
