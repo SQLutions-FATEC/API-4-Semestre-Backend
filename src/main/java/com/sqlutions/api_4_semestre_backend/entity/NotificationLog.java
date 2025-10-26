@@ -2,7 +2,6 @@ package com.sqlutions.api_4_semestre_backend.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Entity
 @Table(name = "notification_logs")
@@ -33,8 +32,8 @@ public class NotificationLog {
         this.errorDetails = errorDetails;
         this.indexType = indexType;
         this.indexValue = indexValue;
-        this.timestamp = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
+        this.timestamp = LocalDateTime.now().minusHours(3);
     }
 
     public Long getId() {
