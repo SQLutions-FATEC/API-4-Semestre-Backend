@@ -2,25 +2,21 @@ package com.sqlutions.api_4_semestre_backend.service;
 
 import com.sqlutions.api_4_semestre_backend.entity.NotificationLog;
 import com.sqlutions.api_4_semestre_backend.repository.NotificationLogRepository;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class NotificationService {
 
-    @Value("${twilio.account-sid}")
-    private String accountSid;
+    @Value("${telegram.bot.token}")
+    private String botToken;
 
-    @Value("${twilio.auth-token}")
-    private String authToken;
-
-    @Value("${twilio.from-number}")
-    private String fromNumber;
-
-    @Value("${notification.to-number}")
-    private String toNumber;
+    @Value("${telegram.chat.id}")
+    private String chatId;
 
     private final NotificationLogRepository logRepository;
 
@@ -28,29 +24,34 @@ public class NotificationService {
         this.logRepository = logRepository;
     }
 
-   
     public void sendAlert(String messageText, String indexType, Integer indexValue) {
-        Twilio.init(accountSid, authToken);
         boolean success = false;
         String errorDetails = null;
 
         try {
-            Message message = Message.creator(
-                    new com.twilio.type.PhoneNumber(toNumber),
-                    new com.twilio.type.PhoneNumber(fromNumber),
-                    messageText
-            ).create();
+            String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+
+            String json = String.format(
+                    "{\"chat_id\": \"%s\", \"text\": \"%s\", \"parse_mode\": \"Markdown\"}",
+                    chatId, messageText
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> request = new HttpEntity<>(json, headers);
+            new RestTemplate().postForObject(url, request, String.class);
 
             success = true;
-            System.out.println(" Notificação enviada com sucesso: " + message.getSid());
+            System.out.println("✅ Notificação enviada via Telegram com sucesso!");
         } catch (Exception e) {
             errorDetails = e.getMessage();
-            System.err.println(" Falha ao enviar notificação: " + e.getMessage());
+            System.err.println("❌ Falha ao enviar notificação via Telegram: " + errorDetails);
         }
 
         NotificationLog log = new NotificationLog(
                 messageText,
-                toNumber,
+                chatId,
                 success,
                 errorDetails,
                 indexType,
