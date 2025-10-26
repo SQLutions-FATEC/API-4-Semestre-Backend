@@ -71,7 +71,7 @@ public class ReadingServiceImpl implements ReadingService {
         LocalDateTime endDate = startDate != null ? startDate : timeService.getCurrentTimeClampedToDatabase();
         startDate = endDate.minusMinutes(minutes);
         System.out.println("Fetching readings from " + startDate + " to " + endDate);
-                
+
         List<Reading> readings = readingRepository.findByDateBetween(startDate, endDate);
         return groupReadings(readings);
     }
@@ -146,11 +146,12 @@ public class ReadingServiceImpl implements ReadingService {
                             .collect(java.util.stream.Collectors.groupingBy(r -> r.getDate()
                                     .withMinute((r.getDate().getMinute() / 10) * 10).withSecond(0).withNano(0)))
                             .values());
-        } else if (samplePeriod.compareTo(java.time.Duration.ofDays(1)) < 0) {
-            System.out.println("Sample period is less than a day, grouping by hour");
+        } else if (samplePeriod.compareTo(java.time.Duration.ofDays(3)) < 0) {
+            System.out.println("Sample period is less than 3 days, grouping by hour");
             readings.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
             groupedReadings = new java.util.ArrayList<>(
                     readings.stream()
+                    
                             .collect(java.util.stream.Collectors.groupingBy(r -> r.getDate().withMinute(0).withSecond(0)
                                     .withNano(0).withHour(r.getDate().getHour())))
                             .values());
