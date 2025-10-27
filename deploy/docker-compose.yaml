@@ -13,6 +13,8 @@ services:
       - SPRING_DATASOURCE_URL
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
     depends_on:
       importer: # The backend now waits for the importer to finish
         condition: service_completed_successfully
@@ -66,4 +68,3 @@ services:
 
 volumes:
   pgdata:
-
