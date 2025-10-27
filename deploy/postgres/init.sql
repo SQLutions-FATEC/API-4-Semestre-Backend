@@ -1,3 +1,4 @@
+\c api;
 -- Criar tipo ENUM para veículos
 CREATE TYPE tipo_veiculo AS ENUM (
     'Carro',
@@ -8,24 +9,25 @@ CREATE TYPE tipo_veiculo AS ENUM (
     'Moto',
     'Indefinido'
 );
-
 CREATE TYPE nivel_usuario AS ENUM (
-    'Admin',
+    'Admin', 
     'Gestor'
-)
+);
 
 -- Endereço
 CREATE TABLE endereco (
     id SERIAL PRIMARY KEY,
-    ende VARCHAR(150) NOT NULL UNIQUE
+    ende VARCHAR(150) NOT NULL UNIQUE,
+    bairro VARCHAR(50),
+    regiao VARCHAR(30),
+    trecho GEOMETRY(LineString, 4326)
 );
 
 -- Radar
 CREATE TABLE radar (
     id VARCHAR(9) PRIMARY KEY, -- camera_numero
     id_end INT NOT NULL, --refere-se ao id do endereço
-    latitude DECIMAL(9,6) NOT NULL,
-    longitude DECIMAL(9,6) NOT NULL,
+    localizacao GEOMETRY(Point, 4326),
     vel_reg INT NOT NULL,
     CONSTRAINT fk_radar_endereco FOREIGN KEY (id_end) REFERENCES endereco(id)
 );
@@ -47,4 +49,28 @@ CREATE TABLE usuario (
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(100) NOT NULL,
     nivel nivel_usuario NOT NULL
+);
+
+-- Log de Notificações
+CREATE TABLE log_notificacao (
+    id SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    titulo VARCHAR(50) NOT NULL,
+    mensagem TEXT NOT NULL,
+    data_emissao TIMESTAMP DEFAULT NOW(),
+    data_conclusao TIMESTAMP,
+    CONSTRAINT fk_log_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
+);
+
+-- Regiões
+CREATE TABLE regioes (
+    id SERIAL PRIMARY KEY,
+    nome_regiao VARCHAR(100) NOT NULL UNIQUE,
+    area_regiao GEOMETRY(Polygon, 4326) NOT NULL
+);
+
+-- Pontos de onibus
+CREATE TABLE pontos_onibus(
+    id BIGINT PRIMARY KEY,
+    ponto GEOMETRY(Point, 4326) NOT NULL
 );

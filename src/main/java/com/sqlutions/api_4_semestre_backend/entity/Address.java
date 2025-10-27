@@ -1,5 +1,8 @@
 package com.sqlutions.api_4_semestre_backend.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.sqlutions.api_4_semestre_backend.config.GeometrySerializer;
+
 import jakarta.persistence.Column; 
 import jakarta.persistence.Entity; 
 import jakarta.persistence.GeneratedValue; 
@@ -19,11 +22,12 @@ public class Address {
     @Column(nullable = false, name = "ende")
     private String address;
 
-    @Column(nullable = false, name = "bairro")
-    private String neighborhood;
-
-    @Column(nullable = false, name = "regiao")
+    @Column(nullable = true, name = "regiao")
     private String region;
+
+    @Column(nullable = true, name = "trecho", columnDefinition = "GEOMETRY(LineString,4326)")
+    @JsonSerialize(using = GeometrySerializer.class)
+    private org.locationtech.jts.geom.LineString stretch;
 
     public Long getId() {
         return id;
@@ -37,16 +41,16 @@ public class Address {
         return address;
     }
 
+    public org.locationtech.jts.geom.LineString getStretch() {
+        return stretch;
+    }
+
+    public void setStretch(org.locationtech.jts.geom.LineString stretch) {
+        this.stretch = stretch;
+    }
+
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getNeighborhood() {
-        return neighborhood;
-    }
-
-    public void setNeighborhood(String neighborhood) {
-        this.neighborhood = neighborhood;
     }
 
     public String getRegion() {
