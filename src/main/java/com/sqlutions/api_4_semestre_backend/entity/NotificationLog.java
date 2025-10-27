@@ -32,8 +32,12 @@ public class NotificationLog {
         this.errorDetails = errorDetails;
         this.indexType = indexType;
         this.indexValue = indexValue;
+<<<<<<< HEAD
 
         this.timestamp = LocalDateTime.now().minusHours(3);
+=======
+        this.timestamp = LocalDateTime.now();
+>>>>>>> parent of 9e34b9e (fix(SCRUM-40): update the date shown in notification)
     }
 
     public Long getId() {
