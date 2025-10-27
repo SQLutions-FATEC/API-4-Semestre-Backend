@@ -20,7 +20,7 @@ public class SimulationController {
             @RequestParam(defaultValue = "0") int trafficIndex,
             @RequestParam(defaultValue = "0") int securityIndex
     ) {
-        Index index = new Index(trafficIndex, securityIndex);
+        Index index = new Index(trafficIndex, securityIndex, null, null);
 
         eventPublisher.publishEvent(new HighIndexEvent(this, index));
 
@@ -32,7 +32,7 @@ public class SimulationController {
 
     @GetMapping("/all")
     public String simulateAll() {
-        Index index = new Index(5, 5);
+        Index index = new Index(5, 5, null, null);
         eventPublisher.publishEvent(new HighIndexEvent(this, index));
         return " Simulação completa enviada (tráfego e segurança críticos)!";
     }
