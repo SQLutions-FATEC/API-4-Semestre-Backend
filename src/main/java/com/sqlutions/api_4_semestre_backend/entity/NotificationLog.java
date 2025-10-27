@@ -32,7 +32,8 @@ public class NotificationLog {
         this.errorDetails = errorDetails;
         this.indexType = indexType;
         this.indexValue = indexValue;
-        this.timestamp = LocalDateTime.now();
+
+        this.timestamp = LocalDateTime.now().minusHours(3);
     }
 
     public Long getId() {

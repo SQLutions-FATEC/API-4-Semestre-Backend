@@ -23,8 +23,8 @@ public class HighIndexEventListener {
 
         int trafficIndex = index.getTrafficIndex();
         int securityIndex = index.getSecurityIndex();
+        String timestamp = LocalDateTime.now().minusHours(3).format(formatter);
 
-        String timestamp = LocalDateTime.now().format(formatter);
 
         if (trafficIndex >= 3) {
             String message = String.format(
