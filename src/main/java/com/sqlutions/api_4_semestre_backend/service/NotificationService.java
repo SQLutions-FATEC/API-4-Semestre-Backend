@@ -16,7 +16,7 @@ public class NotificationService {
     @Value("${telegram.bot.token}")
     private String botToken;
 
-    @Value("${telegram.chat.id}")
+    @Value("${telegram.bot.chat-id}")
     private String chatId;
 
     private final NotificationLogRepository logRepository;
