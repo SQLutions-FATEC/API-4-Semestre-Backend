@@ -4,6 +4,9 @@ import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.event.HighIndexEvent;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,9 +27,10 @@ public class IndexMonitorService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    
+    @Autowired
    private TimeService timeService; 
 
+   @Transactional
     @Scheduled(fixedRate = 300000) 
     public void monitorTrafficAndSecurity() {
         LocalDateTime now = timeService.getCurrentTimeClampedToDatabase();

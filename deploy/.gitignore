@@ -1,10 +1,2 @@
-<<<<<<< HEAD
 *.csv
 .env
-echo "API-4-Semestre-Backend/" >> .gitignore
-git add .gitignore
-git commit -m "Ignora pasta duplicada API-4-Semestre-Backend"
-git push
-=======
-data/*
->>>>>>> origin/develop-2
