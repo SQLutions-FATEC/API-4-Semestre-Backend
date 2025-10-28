@@ -1,0 +1,69 @@
+services:
+  # -------------------- Backend --------------------
+  backend:
+    build:
+      context: ./backend
+      args:
+        - BACKEND_BRANCH
+        - REPO_URL=https://github.com/SQLutions-FATEC/API-4-Semestre-Backend.git
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      importer: # The backend now waits for the importer to finish
+        condition: service_completed_successfully
+
+  # -------------------- Frontend --------------------
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - FRONTEND_BRANCH
+        - REPO_URL=https://github.com/SQLutions-FATEC/API-4-Semestre-Frontend.git
+    container_name: vue-app
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # -------------------- Database --------------------
+  custom-postgres:
+    build: ./postgres
+    container_name: psql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_IMPORT_MODE=${POSTGRES_IMPORT_MODE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sqlutions -d api"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------- Importer --------------------
+  importer:
+      build: ./importer
+      environment:
+        - PYTHONUNBUFFERED=1
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_DB=${POSTGRES_DB}
+        - DB_HOST=custom-postgres
+      depends_on:
+        custom-postgres:
+          condition: service_healthy
+      volumes:
+        - ./data:/app/data
+
+volumes:
+  pgdata:
+
