@@ -1,6 +1,5 @@
 package com.sqlutions.api_4_semestre_backend.listener;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +8,16 @@ import org.springframework.stereotype.Component;
 
 import com.sqlutions.api_4_semestre_backend.event.HighIndexEvent;
 import com.sqlutions.api_4_semestre_backend.service.NotificationService;
+import com.sqlutions.api_4_semestre_backend.service.TimeService;
 
 @Component
 public class HighIndexEventListener {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private TimeService timeService;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
@@ -24,8 +27,7 @@ public class HighIndexEventListener {
 
         int trafficIndex = index.getTrafficIndex();
         int securityIndex = index.getSecurityIndex();
-        String timestamp = LocalDateTime.now().minusHours(3).format(formatter);
-
+        String timestamp = timeService.getCurrentTimeClampedToDatabase().minusHours(3).format(formatter);
 
         if (trafficIndex >= 3) {
             String message = String.format(
@@ -36,7 +38,7 @@ public class HighIndexEventListener {
                 trafficIndex, timestamp
             );
 
-            System.out.println(" Enviando alerta sobre tráfego...");
+            System.out.println("Enviando alerta sobre tráfego...");
             notificationService.sendAlert(message, "TRAFFIC", trafficIndex);
         }
 
@@ -49,7 +51,7 @@ public class HighIndexEventListener {
                 securityIndex, timestamp
             );
 
-            System.out.println(" Enviando alerta sobre segurança...");
+            System.out.println("Enviando alerta sobre segurança...");
             notificationService.sendAlert(message, "SECURITY", securityIndex);
         }
     }
