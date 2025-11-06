@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
+import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.repository.RadarRepository;
@@ -151,7 +152,7 @@ public class ReadingServiceImpl implements ReadingService {
             readings.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
             groupedReadings = new java.util.ArrayList<>(
                     readings.stream()
-                    
+
                             .collect(java.util.stream.Collectors.groupingBy(r -> r.getDate().withMinute(0).withSecond(0)
                                     .withNano(0).withHour(r.getDate().getHour())))
                             .values());
@@ -215,4 +216,19 @@ public class ReadingServiceImpl implements ReadingService {
         return null;
     }
 
+    @Override
+    public List<ReadingGroupAggregate> getReadingGroups(int minutes, @Nullable String radarId,
+            @Nullable Integer addressId,
+            @Nullable String regionId) {
+        LocalDateTime endDate = timeService.getCurrentTimeClampedToDatabase();
+        LocalDateTime startDate = endDate.minusMinutes(minutes);
+        List<ReadingGroupAggregate> readings = readingRepository.findAggregatedReadings(startDate, endDate,
+                java.util.Optional.ofNullable(radarId), java.util.Optional.ofNullable(addressId),
+                java.util.Optional.ofNullable(regionId));
+        if (readings.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Readings list is null or empty");
+        }
+        return readings;
+    }
 }

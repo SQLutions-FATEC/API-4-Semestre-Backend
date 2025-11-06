@@ -3,6 +3,7 @@ package com.sqlutions.api_4_semestre_backend.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 
@@ -28,4 +29,6 @@ public interface ReadingService {
     Reading updateReading(Reading reading);
 
     Void deleteReading(Integer id);
+
+    List<ReadingGroupAggregate> getReadingGroups(int minutes, @Nullable String radarId, @Nullable Integer addressId, @Nullable String regionId);
 }
