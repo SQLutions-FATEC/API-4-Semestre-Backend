@@ -55,11 +55,20 @@ public class ReadingController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ReadingGroupAggregate>> getReadingGroups(
+    public ResponseEntity<ReadingGroupAggregate> getReadings(
             @RequestParam int minutes,
-            @RequestParam(required = false) String radarId,
-            @RequestParam(required = false) Integer addressId,
-            @RequestParam(required = false) String regionId) {
-        return ResponseEntity.ok(readingService.getReadingGroups(minutes, radarId, addressId, regionId));
+            @RequestParam(required = false) List<String> radars,
+            @RequestParam(required = false) List<String> addresses,
+            @RequestParam(required = false) List<String> regions) {
+        return ResponseEntity.ok(readingService.getReadings(minutes, radars, addresses, regions));
+    }
+    
+    @GetMapping("/series")
+    public ResponseEntity<List<ReadingGroupAggregate>> getReadingSeries(
+            @RequestParam int minutes,
+            @RequestParam(required = false) List<String> radars,
+            @RequestParam(required = false) List<String> addresses,
+            @RequestParam(required = false) List<String> regions) {
+        return ResponseEntity.ok(readingService.getReadingSeries(minutes, radars, addresses, regions));
     }
 }
