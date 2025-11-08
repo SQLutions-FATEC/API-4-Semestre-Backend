@@ -56,7 +56,7 @@ public class ReadingController {
 
     @GetMapping()
     public ResponseEntity<ReadingGroupAggregate> getReadings(
-            @RequestParam int minutes,
+            @RequestParam(required = false, defaultValue = "5") int minutes,
             @RequestParam(required = false) List<String> radars,
             @RequestParam(required = false) List<String> addresses,
             @RequestParam(required = false) List<String> regions) {
@@ -65,7 +65,7 @@ public class ReadingController {
     
     @GetMapping("/series")
     public ResponseEntity<List<ReadingGroupAggregate>> getReadingSeries(
-            @RequestParam int minutes,
+            @RequestParam(required = false, defaultValue = "5") int minutes,
             @RequestParam(required = false) List<String> radars,
             @RequestParam(required = false) List<String> addresses,
             @RequestParam(required = false) List<String> regions) {
