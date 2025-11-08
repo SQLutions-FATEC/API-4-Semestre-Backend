@@ -7,28 +7,28 @@ public class ReadingGroupAggregate {
 
     LocalDateTime timeInterval;
     BigDecimal averageSpeed;
-    Long readingCount;
+    Integer readingCount;
     LocalDateTime endTime;
     LocalDateTime startTime;
     BigDecimal avgSpeed;
     BigDecimal maxSpeed;
     BigDecimal minSpeed;
     BigDecimal avgSpeedLimit;
-    Long speedingCount;
+    Integer speedingCount;
     BigDecimal averageSpeedingAmount;
-    Long carCount;
-    Long camioneteCount;
-    Long onibusCount;
-    Long vanCount;
-    Long caminhaoGrandeCount;
-    Long motoCount;
-    Long indefinidoCount;
+    Integer carCount;
+    Integer camioneteCount;
+    Integer onibusCount;
+    Integer vanCount;
+    Integer caminhaoGrandeCount;
+    Integer motoCount;
+    Integer indefinidoCount;
 
-    public ReadingGroupAggregate(LocalDateTime timeInterval, BigDecimal averageSpeed, Long readingCount,
+    public ReadingGroupAggregate(LocalDateTime timeInterval, BigDecimal averageSpeed, Integer readingCount,
             LocalDateTime endTime, LocalDateTime startTime, BigDecimal avgSpeed, BigDecimal maxSpeed,
-            BigDecimal minSpeed, BigDecimal avgSpeedLimit, Long speedingCount, BigDecimal averageSpeedingAmount,
-            Long carCount, Long camioneteCount, Long onibusCount, Long vanCount, Long caminhaoGrandeCount,
-            Long motoCount, Long indefinidoCount) {
+            BigDecimal minSpeed, BigDecimal avgSpeedLimit, Integer speedingCount, BigDecimal averageSpeedingAmount,
+            Integer carCount, Integer camioneteCount, Integer onibusCount, Integer vanCount, Integer caminhaoGrandeCount,
+            Integer motoCount, Integer indefinidoCount) {
         this.timeInterval = timeInterval;
         this.averageSpeed = averageSpeed;
         this.readingCount = readingCount;
@@ -57,7 +57,7 @@ public class ReadingGroupAggregate {
         this.averageSpeed = averageSpeed;
     }
 
-    public void setReadingCount(Long readingCount) {
+    public void setReadingCount(Integer readingCount) {
         this.readingCount = readingCount;
     }
 
@@ -109,11 +109,11 @@ public class ReadingGroupAggregate {
         this.avgSpeedLimit = avgSpeedLimit;
     }
 
-    public Long getSpeedingCount() {
+    public Integer getSpeedingCount() {
         return speedingCount;
     }
 
-    public void setSpeedingCount(Long speedingCount) {
+    public void setSpeedingCount(Integer speedingCount) {
         this.speedingCount = speedingCount;
     }
 
@@ -125,59 +125,59 @@ public class ReadingGroupAggregate {
         this.averageSpeedingAmount = averageSpeedingAmount;
     }
 
-    public Long getCarCount() {
+    public Integer getCarCount() {
         return carCount;
     }
 
-    public void setCarCount(Long carCount) {
+    public void setCarCount(Integer carCount) {
         this.carCount = carCount;
     }
 
-    public Long getCamioneteCount() {
+    public Integer getCamioneteCount() {
         return camioneteCount;
     }
 
-    public void setCamioneteCount(Long camioneteCount) {
+    public void setCamioneteCount(Integer camioneteCount) {
         this.camioneteCount = camioneteCount;
     }
 
-    public Long getOnibusCount() {
+    public Integer getOnibusCount() {
         return onibusCount;
     }
 
-    public void setOnibusCount(Long onibusCount) {
+    public void setOnibusCount(Integer onibusCount) {
         this.onibusCount = onibusCount;
     }
 
-    public Long getVanCount() {
+    public Integer getVanCount() {
         return vanCount;
     }
 
-    public void setVanCount(Long vanCount) {
+    public void setVanCount(Integer vanCount) {
         this.vanCount = vanCount;
     }
 
-    public Long getCaminhaoGrandeCount() {
+    public Integer getCaminhaoGrandeCount() {
         return caminhaoGrandeCount;
     }
 
-    public void setCaminhaoGrandeCount(Long caminhaoGrandeCount) {
+    public void setCaminhaoGrandeCount(Integer caminhaoGrandeCount) {
         this.caminhaoGrandeCount = caminhaoGrandeCount;
     }
 
-    public Long getMotoCount() {
+    public Integer getMotoCount() {
         return motoCount;
     }
 
-    public void setMotoCount(Long motoCount) {
+    public void setMotoCount(Integer motoCount) {
         this.motoCount = motoCount;
     }
 
-    public Long getIndefinidoCount() {
+    public Integer getIndefinidoCount() {
         return indefinidoCount;
     }
 
-    public void setIndefinidoCount(Long indefinidoCount) {
+    public void setIndefinidoCount(Integer indefinidoCount) {
         this.indefinidoCount = indefinidoCount;
     }
 
@@ -189,7 +189,7 @@ public class ReadingGroupAggregate {
         return averageSpeed;
     }
 
-    public Long getReadingCount() {
+    public Integer getReadingCount() {
         return readingCount;
     }
 
