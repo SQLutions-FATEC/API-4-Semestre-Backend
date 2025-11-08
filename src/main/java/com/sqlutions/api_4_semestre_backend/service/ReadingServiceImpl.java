@@ -236,10 +236,10 @@ public class ReadingServiceImpl implements ReadingService {
     }
 
     @Override
-    public List<ReadingGroupAggregate> getReadingSeries(int minutes, @Nullable List<String> radarIds,
+    public List<ReadingGroupAggregate> getReadingSeries(int minutes, @Nullable LocalDateTime timestamp, @Nullable List<String> radarIds,
             @Nullable List<String> addresses,
             @Nullable List<String> regionIds) {
-        LocalDateTime endDate = timeService.getCurrentTimeClampedToDatabase();
+        LocalDateTime endDate = timestamp != null ? timestamp : timeService.getCurrentTimeClampedToDatabase();
         LocalDateTime startDate = endDate.minusMinutes(minutes);
         List<ReadingGroupAggregate> readings = readingRepository.findAggregatedReadingSeries(
                 startDate,

@@ -1,6 +1,7 @@
 package com.sqlutions.api_4_semestre_backend.controller;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,7 @@ public class ReadingController {
     @GetMapping()
     public ResponseEntity<ReadingGroupAggregate> getReadings(
             @RequestParam(required = false, defaultValue = "5") int minutes,
+            @RequestParam(required = false) LocalDateTime timestamp,
             @RequestParam(required = false) List<String> radars,
             @RequestParam(required = false) List<String> addresses,
             @RequestParam(required = false) List<String> regions) {
@@ -66,9 +68,10 @@ public class ReadingController {
     @GetMapping("/series")
     public ResponseEntity<List<ReadingGroupAggregate>> getReadingSeries(
             @RequestParam(required = false, defaultValue = "5") int minutes,
+            @RequestParam(required = false) LocalDateTime timestamp,
             @RequestParam(required = false) List<String> radars,
             @RequestParam(required = false) List<String> addresses,
             @RequestParam(required = false) List<String> regions) {
-        return ResponseEntity.ok(readingService.getReadingSeries(minutes, radars, addresses, regions));
+        return ResponseEntity.ok(readingService.getReadingSeries(minutes, timestamp, radars, addresses, regions));
     }
 }
