@@ -23,10 +23,9 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
     private static final String QUERY_SELECT_COLUMNS = """
             , -- não deletar essa vírgula por favor.
                 AVG(r.vel) AS averageSpeed,
-                COUNT(r.id) AS readingCount,
+                COUNT(r.id) AS totalReadings,
                 MAX(r.dat_hora) AS endTime,
                 MIN(r.dat_hora) AS startTime,
-                AVG(r.vel) as avgSpeed,
                 MAX(r.vel) as maxSpeed,
                 MIN(r.vel) as minSpeed,
                 AVG(rd.vel_reg) as avgSpeedLimit,
@@ -205,30 +204,28 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
         for (Object[] row : rows) {
             LocalDateTime timeInterval = toLocalDateTime.apply(row[0]);
             BigDecimal averageSpeed = toBigDecimal.apply(row[1]);
-            Integer readingCount = toInteger.apply(row[2]);
+            Integer totalReadings = toInteger.apply(row[2]);
             LocalDateTime endTime = toLocalDateTime.apply(row[3]);
             LocalDateTime startTime = toLocalDateTime.apply(row[4]);
-            BigDecimal avgSpeed = toBigDecimal.apply(row[5]);
-            BigDecimal maxSpeed = toBigDecimal.apply(row[6]);
-            BigDecimal minSpeed = toBigDecimal.apply(row[7]);
-            BigDecimal avgSpeedLimit = toBigDecimal.apply(row[8]);
-            Integer speedingCount = toInteger.apply(row[9]);
-            BigDecimal averageSpeedingAmount = toBigDecimal.apply(row[10]);
-            Integer carCount = toInteger.apply(row[11]);
-            Integer camioneteCount = toInteger.apply(row[12]);
-            Integer onibusCount = toInteger.apply(row[13]);
-            Integer vanCount = toInteger.apply(row[14]);
-            Integer caminhaoGrandeCount = toInteger.apply(row[15]);
-            Integer motoCount = toInteger.apply(row[16]);
-            Integer indefinidoCount = toInteger.apply(row[17]);
+            BigDecimal maxSpeed = toBigDecimal.apply(row[5]);
+            BigDecimal minSpeed = toBigDecimal.apply(row[6]);
+            BigDecimal avgSpeedLimit = toBigDecimal.apply(row[7]);
+            Integer speedingCount = toInteger.apply(row[8]);
+            BigDecimal averageSpeedingAmount = toBigDecimal.apply(row[9]);
+            Integer carCount = toInteger.apply(row[10]);
+            Integer camioneteCount = toInteger.apply(row[11]);
+            Integer onibusCount = toInteger.apply(row[12]);
+            Integer vanCount = toInteger.apply(row[13]);
+            Integer caminhaoGrandeCount = toInteger.apply(row[14]);
+            Integer motoCount = toInteger.apply(row[15]);
+            Integer indefinidoCount = toInteger.apply(row[16]);
 
             result.add(new ReadingGroupAggregate(
                     timeInterval,
                     averageSpeed,
-                    readingCount,
+                    totalReadings,
                     endTime,
                     startTime,
-                    avgSpeed,
                     maxSpeed,
                     minSpeed,
                     avgSpeedLimit,

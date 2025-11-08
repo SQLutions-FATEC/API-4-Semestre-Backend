@@ -2,51 +2,46 @@ package com.sqlutions.api_4_semestre_backend.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ReadingGroupAggregate {
 
     LocalDateTime timeInterval;
     BigDecimal averageSpeed;
-    Integer readingCount;
+    Integer totalReadings;
     LocalDateTime endTime;
     LocalDateTime startTime;
-    BigDecimal avgSpeed;
     BigDecimal maxSpeed;
     BigDecimal minSpeed;
     BigDecimal avgSpeedLimit;
     Integer speedingCount;
     BigDecimal averageSpeedingAmount;
-    Integer carCount;
-    Integer camioneteCount;
-    Integer onibusCount;
-    Integer vanCount;
-    Integer caminhaoGrandeCount;
-    Integer motoCount;
-    Integer indefinidoCount;
+    private Map<String, Integer> vehicleTypeCounts = new HashMap<>();
 
-    public ReadingGroupAggregate(LocalDateTime timeInterval, BigDecimal averageSpeed, Integer readingCount,
-            LocalDateTime endTime, LocalDateTime startTime, BigDecimal avgSpeed, BigDecimal maxSpeed,
+    public ReadingGroupAggregate(LocalDateTime timeInterval, BigDecimal averageSpeed, Integer totalReadings,
+            LocalDateTime endTime, LocalDateTime startTime, BigDecimal maxSpeed,
             BigDecimal minSpeed, BigDecimal avgSpeedLimit, Integer speedingCount, BigDecimal averageSpeedingAmount,
-            Integer carCount, Integer camioneteCount, Integer onibusCount, Integer vanCount, Integer caminhaoGrandeCount,
+            Integer carCount, Integer camioneteCount, Integer onibusCount, Integer vanCount,
+            Integer caminhaoGrandeCount,
             Integer motoCount, Integer indefinidoCount) {
         this.timeInterval = timeInterval;
         this.averageSpeed = averageSpeed;
-        this.readingCount = readingCount;
+        this.totalReadings = totalReadings;
         this.endTime = endTime;
         this.startTime = startTime;
-        this.avgSpeed = avgSpeed;
         this.maxSpeed = maxSpeed;
         this.minSpeed = minSpeed;
         this.avgSpeedLimit = avgSpeedLimit;
         this.speedingCount = speedingCount;
         this.averageSpeedingAmount = averageSpeedingAmount;
-        this.carCount = carCount;
-        this.camioneteCount = camioneteCount;
-        this.onibusCount = onibusCount;
-        this.vanCount = vanCount;
-        this.caminhaoGrandeCount = caminhaoGrandeCount;
-        this.motoCount = motoCount;
-        this.indefinidoCount = indefinidoCount;
+        this.vehicleTypeCounts.put("Indefinido", indefinidoCount);
+        this.vehicleTypeCounts.put("Carro", carCount);
+        this.vehicleTypeCounts.put("Camionete", camioneteCount);
+        this.vehicleTypeCounts.put("Ônibus", onibusCount);
+        this.vehicleTypeCounts.put("Van", vanCount);
+        this.vehicleTypeCounts.put("Caminhão grande", caminhaoGrandeCount);
+        this.vehicleTypeCounts.put("Moto", motoCount);
     }
 
     public void setTimeInterval(LocalDateTime timeInterval) {
@@ -57,8 +52,8 @@ public class ReadingGroupAggregate {
         this.averageSpeed = averageSpeed;
     }
 
-    public void setReadingCount(Integer readingCount) {
-        this.readingCount = readingCount;
+    public void setTotalReadings(Integer totalReadings) {
+        this.totalReadings = totalReadings;
     }
 
     public LocalDateTime getEndTime() {
@@ -75,14 +70,6 @@ public class ReadingGroupAggregate {
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
-    }
-
-    public BigDecimal getAvgSpeed() {
-        return avgSpeed;
-    }
-
-    public void setAvgSpeed(BigDecimal avgSpeed) {
-        this.avgSpeed = avgSpeed;
     }
 
     public BigDecimal getMaxSpeed() {
@@ -125,60 +112,8 @@ public class ReadingGroupAggregate {
         this.averageSpeedingAmount = averageSpeedingAmount;
     }
 
-    public Integer getCarCount() {
-        return carCount;
-    }
-
-    public void setCarCount(Integer carCount) {
-        this.carCount = carCount;
-    }
-
-    public Integer getCamioneteCount() {
-        return camioneteCount;
-    }
-
-    public void setCamioneteCount(Integer camioneteCount) {
-        this.camioneteCount = camioneteCount;
-    }
-
-    public Integer getOnibusCount() {
-        return onibusCount;
-    }
-
-    public void setOnibusCount(Integer onibusCount) {
-        this.onibusCount = onibusCount;
-    }
-
-    public Integer getVanCount() {
-        return vanCount;
-    }
-
-    public void setVanCount(Integer vanCount) {
-        this.vanCount = vanCount;
-    }
-
-    public Integer getCaminhaoGrandeCount() {
-        return caminhaoGrandeCount;
-    }
-
-    public void setCaminhaoGrandeCount(Integer caminhaoGrandeCount) {
-        this.caminhaoGrandeCount = caminhaoGrandeCount;
-    }
-
-    public Integer getMotoCount() {
-        return motoCount;
-    }
-
-    public void setMotoCount(Integer motoCount) {
-        this.motoCount = motoCount;
-    }
-
-    public Integer getIndefinidoCount() {
-        return indefinidoCount;
-    }
-
-    public void setIndefinidoCount(Integer indefinidoCount) {
-        this.indefinidoCount = indefinidoCount;
+    public Map<String, Integer> getVehicleTypeCounts() {
+        return vehicleTypeCounts;
     }
 
     public LocalDateTime getTimeInterval() {
@@ -189,8 +124,8 @@ public class ReadingGroupAggregate {
         return averageSpeed;
     }
 
-    public Integer getReadingCount() {
-        return readingCount;
+    public Integer getTotalReadings() {
+        return totalReadings;
     }
 
 }

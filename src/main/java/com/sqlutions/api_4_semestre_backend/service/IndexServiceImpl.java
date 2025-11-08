@@ -63,7 +63,7 @@ public class IndexServiceImpl implements IndexService {
      * @return Índice de segurança calculado (1 a 5).
      */
     private Integer getSecurityIndex(ReadingGroupAggregate aggregate) {
-        Integer totalReadings = aggregate.getReadingCount();
+        Integer totalReadings = aggregate.getTotalReadings();
         if (totalReadings == 0) {
             return 1; // Melhor índice se não há dados
         }
@@ -93,7 +93,7 @@ public class IndexServiceImpl implements IndexService {
         LocalDateTime maxDate = aggregate.getEndTime();
 
         // Se não há dados ou período, retorna o melhor índice
-        if (minDate == null || maxDate == null || aggregate.getReadingCount() == 0) {
+        if (minDate == null || maxDate == null || aggregate.getTotalReadings() == 0) {
             return 1;
         }
 
@@ -104,10 +104,10 @@ public class IndexServiceImpl implements IndexService {
             readingLengthMinutes = 1; // Assume pelo menos 1 minuto para evitar divisão por zero
         }
 
-        Float averageReadingsPerMinute = aggregate.getReadingCount() / readingLengthMinutes;
+        Float averageReadingsPerMinute = aggregate.getTotalReadings() / readingLengthMinutes;
 
         // Usa as médias já calculadas pelo SQL
-        Float averageSpeed = aggregate.getAvgSpeed().floatValue();
+        Float averageSpeed = aggregate.getAverageSpeed().floatValue();
         Float averageRegulatedSpeed = aggregate.getAvgSpeedLimit().floatValue();
 
         // Evita divisão por zero se a vel_reg for 0
@@ -137,7 +137,7 @@ public class IndexServiceImpl implements IndexService {
      * Método helper principal para converter um Aggregate em um Index.
      */
     private Index getIndexFromAggregate(ReadingGroupAggregate aggregate) {
-        if (aggregate == null || aggregate.getReadingCount() == 0) {
+        if (aggregate == null || aggregate.getTotalReadings() == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma leitura encontrada para este período ou filtro.");
         }
         Integer trafficIndex = getTrafficIndex(aggregate);
@@ -270,7 +270,7 @@ public class IndexServiceImpl implements IndexService {
                     timeStart, timeEnd, Optional.empty(), Optional.empty(), Optional.of(List.of(region.getNomeRegiao()))
             );
             
-            if (aggregate == null || aggregate.getReadingCount() == 0) {
+            if (aggregate == null || aggregate.getTotalReadings() == 0) {
                 // Se não houver dados, define os índices como os melhores (1)
                 regionMap.setTrafficIndex(1);
                 regionMap.setSecurityIndex(1);
@@ -282,13 +282,7 @@ public class IndexServiceImpl implements IndexService {
                 Integer overallIndex = Math.round((regionMap.getTrafficIndex() + regionMap.getSecurityIndex()) / 2.0f);
                 regionMap.setOverallIndex(overallIndex);
 
-                regionMap.getVehicleTypeCounts().put("Carro", aggregate.getCarCount());
-                regionMap.getVehicleTypeCounts().put("Camionete", aggregate.getCamioneteCount());
-                regionMap.getVehicleTypeCounts().put("Onibus", aggregate.getOnibusCount());
-                regionMap.getVehicleTypeCounts().put("Van", aggregate.getVanCount());
-                regionMap.getVehicleTypeCounts().put("Caminhão grande", aggregate.getCaminhaoGrandeCount());
-                regionMap.getVehicleTypeCounts().put("Moto", aggregate.getMotoCount());
-                regionMap.getVehicleTypeCounts().put("Indefinido", aggregate.getIndefinidoCount());
+                regionMap.setVehicleTypeCounts(aggregate.getVehicleTypeCounts());
             }
 
             regionMaps.add(regionMap);
