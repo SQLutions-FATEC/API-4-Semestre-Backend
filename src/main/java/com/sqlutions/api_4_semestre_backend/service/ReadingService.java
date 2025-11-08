@@ -30,5 +30,7 @@ public interface ReadingService {
 
     Void deleteReading(Integer id);
 
-    List<ReadingGroupAggregate> getReadingGroups(int minutes, @Nullable String radarId, @Nullable Integer addressId, @Nullable String regionId);
+    ReadingGroupAggregate getReadings(int minutes, @Nullable List<String> radarId, @Nullable List<String> addresses, @Nullable List<String> regionId);
+
+    List<ReadingGroupAggregate> getReadingSeries(int minutes, @Nullable List<String> radarIds, @Nullable List<String> addresses, @Nullable List<String> regionIds);
 }

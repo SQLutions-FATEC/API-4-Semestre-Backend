@@ -2,6 +2,7 @@ package com.sqlutions.api_4_semestre_backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
+import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.repository.RadarRepository;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
 
@@ -217,14 +218,35 @@ public class ReadingServiceImpl implements ReadingService {
     }
 
     @Override
-    public List<ReadingGroupAggregate> getReadingGroups(int minutes, @Nullable String radarId,
-            @Nullable Integer addressId,
-            @Nullable String regionId) {
+    public ReadingGroupAggregate getReadings(int minutes, @Nullable List<String> radarIds, @Nullable List<String> addresses,
+            @Nullable List<String> regionIds) {
         LocalDateTime endDate = timeService.getCurrentTimeClampedToDatabase();
         LocalDateTime startDate = endDate.minusMinutes(minutes);
-        List<ReadingGroupAggregate> readings = readingRepository.findAggregatedReadings(startDate, endDate,
-                java.util.Optional.ofNullable(radarId), java.util.Optional.ofNullable(addressId),
-                java.util.Optional.ofNullable(regionId));
+        ReadingGroupAggregate reading = readingRepository.findSingleAggregatedReading(
+                startDate,
+                endDate,
+                Optional.ofNullable(radarIds),
+                Optional.ofNullable(addresses),
+                Optional.ofNullable(regionIds));
+        if (reading == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Readings list is null or empty");
+        }
+        return reading;
+    }
+
+    @Override
+    public List<ReadingGroupAggregate> getReadingSeries(int minutes, @Nullable List<String> radarIds,
+            @Nullable List<String> addresses,
+            @Nullable List<String> regionIds) {
+        LocalDateTime endDate = timeService.getCurrentTimeClampedToDatabase();
+        LocalDateTime startDate = endDate.minusMinutes(minutes);
+        List<ReadingGroupAggregate> readings = readingRepository.findAggregatedReadingSeries(
+                startDate,
+                endDate,
+                Optional.ofNullable(radarIds),
+                Optional.ofNullable(addresses),
+                Optional.ofNullable(regionIds));
         if (readings.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Readings list is null or empty");
