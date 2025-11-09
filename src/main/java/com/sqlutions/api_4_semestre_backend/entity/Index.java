@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class Index {
     private Integer securityIndex;
     private Integer trafficIndex;
+    private Integer volumeIndex;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
@@ -27,9 +28,10 @@ public class Index {
         this.endTime = endTime;
     }
 
-    public Index(Integer securityIndex, Integer trafficIndex, LocalDateTime startTime, LocalDateTime endTime) {
+    public Index(Integer securityIndex, Integer trafficIndex, Integer volumeIndex,LocalDateTime startTime, LocalDateTime endTime) {
         this.securityIndex = securityIndex;
         this.trafficIndex = trafficIndex;
+        this.volumeIndex = volumeIndex;
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -48,6 +50,14 @@ public class Index {
 
     public void setTrafficIndex(Integer trafficIndex) {
         this.trafficIndex = trafficIndex;
+    }
+
+    public Integer getVolumeIndex() {
+        return volumeIndex;
+    }
+
+    public void setVolumeIndex(Integer volumeIndex) {
+        this.volumeIndex = volumeIndex;
     }
 
     public Integer getCombinedIndex() {
