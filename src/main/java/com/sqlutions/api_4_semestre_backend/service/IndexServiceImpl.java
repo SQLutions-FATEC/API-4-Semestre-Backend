@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,6 +68,95 @@ public class IndexServiceImpl implements IndexService {
 
     @Autowired
     private ReadingService readingService;
+
+    /**
+     * Calcula o índice de volume com base em uma lista de leituras realizadas
+     * em um determinado radar ou conjunto de sensores.
+     * 
+     * O índice é um valor inteiro de 1 a 5, onde:
+     * <ul>
+     * <li><b>1</b> representa baixo volume de tráfego (poucos veículos detectados
+     * em longos intervalos de tempo);</li>
+     * <li><b>5</b> representa alto volume de tráfego (muitos veículos detectados
+     * em curtos intervalos de tempo).</li>
+     * </ul>
+     * 
+     * O cálculo é baseado no tempo médio entre leituras consecutivas
+     * (diferença entre os instantes de detecção de veículos), conforme a fórmula:
+     * 
+     * <pre>
+     * t_ultima_leitura = t_atual - t_anterior
+     * volumeRate = total_leituras / tempo_medio_entre_leituras
+     * </pre>
+     * 
+     * Quanto menor o intervalo médio entre leituras, maior o volumeRate e,
+     * consequentemente, o índice de volume.
+     * 
+     * O método realiza os seguintes passos:
+     * <ol>
+     * <li>Ordena as leituras em ordem cronológica.</li>
+     * <li>Calcula o intervalo em segundos entre leituras consecutivas.</li>
+     * <li>Obtém a média desses intervalos.</li>
+     * <li>Deriva a taxa de volume (leituras por segundo) e mapeia para uma
+     * escala de 1 a 5.</li>
+     * </ol>
+     * 
+     * Essa abordagem permite identificar momentos de maior ou menor fluxo
+     * de veículos sem depender de contadores físicos ou agregações no banco
+     * de dados.
+     * 
+     * @param readings Lista de leituras ordenadas ou não, contendo o instante
+     *                 de cada detecção de veículo.
+     * @return Índice de volume calculado (1 a 5), onde valores maiores indicam
+     *         maior intensidade de tráfego.
+     */
+
+    private Integer getVolumeIndex(List<Reading> readings) {
+    if (readings == null || readings.size() < 2) {
+        return 1; // Sem dados suficientes para calcular
+    }
+
+    // Ordena por data/hora
+    readings.sort(Comparator.comparing(Reading::getDate));
+
+    // Calcula intervalos entre leituras consecutivas
+    List<Long> intervals = new ArrayList<>();
+    for (int i = 1; i < readings.size(); i++) {
+        long seconds = Duration.between(
+            readings.get(i - 1).getDate(),
+            readings.get(i).getDate()
+        ).getSeconds();
+        if (seconds > 0) {
+            intervals.add(seconds);
+        }
+    }
+
+    // Média dos intervalos
+    double avgInterval = intervals.stream()
+        .mapToLong(Long::longValue)
+        .average()
+        .orElse(Double.MAX_VALUE);
+
+    // Taxa de volume = número de leituras / tempo médio entre elas
+    double volumeRate = readings.size() / (avgInterval == 0 ? 1 : avgInterval);
+
+    // Define índice com base em thresholds (ajustáveis)
+    int index;
+    if (volumeRate < 0.05) { // tráfego baixo
+        index = 1;
+    } else if (volumeRate < 0.2) {
+        index = 2;
+    } else if (volumeRate < 0.5) {
+        index = 3;
+    } else if (volumeRate < 1.0) {
+        index = 4;
+    } else {
+        index = 5; // tráfego muito intenso
+    }
+
+    return index;
+}
+
 
     /**
      * Calcula o índice de segurança com base em uma lista de leituras de
