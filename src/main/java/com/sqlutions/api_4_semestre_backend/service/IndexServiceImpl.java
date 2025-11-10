@@ -443,8 +443,9 @@ public class IndexServiceImpl implements IndexService {
         }
         Integer trafficIndex = getTrafficIndex(readings);
         Integer securityIndex = getSecurityIndex(readings);
+        Integer volumeIndex = getVolumeIndex(readings);
 
-        return new Index(securityIndex, trafficIndex, readings.get(0).getDate(),
+        return new Index(securityIndex, trafficIndex, volumeIndex, readings.get(0).getDate(),
                 readings.get(readings.size() - 1).getDate());
     }
 
