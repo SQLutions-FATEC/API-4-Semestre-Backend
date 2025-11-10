@@ -33,7 +33,7 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 AVG(CASE WHEN r.vel > rd.vel_reg THEN r.vel - rd.vel_reg ELSE 0 END) AS averageSpeedingAmount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Carro')        AS carCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Camionete')      AS camioneteCount,
-                COUNT(r.id) FILTER (WHERE r.tip_vei = 'Onibus') AS onibusCount,
+                COUNT(r.id) FILTER (WHERE r.tip_vei = 'Ônibus') AS onibusCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Van')       AS vanCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Caminhão grande') AS caminhãoGrandeCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Moto')      AS motoCount,
