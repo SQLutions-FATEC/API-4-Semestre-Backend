@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
 
-public interface ReadingRepository extends JpaRepository<Reading, Integer> {
+public interface ReadingRepository extends JpaRepository<Reading, Integer>, ReadingRepositoryAggregates {
     @Query("SELECT MIN(r.date) FROM Reading r")
     java.time.LocalDateTime findMinDate();
 
