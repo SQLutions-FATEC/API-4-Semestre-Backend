@@ -17,12 +17,13 @@ public class ReadingGroupAggregate {
     BigDecimal avgSpeedLimit;
     Integer speedingCount;
     BigDecimal averageSpeedingAmount;
+    BigDecimal readingFrequency;
     private Map<String, Integer> vehicleTypeCounts = new HashMap<>();
 
     public ReadingGroupAggregate(LocalDateTime timeInterval, BigDecimal averageSpeed, Integer totalReadings,
             LocalDateTime endTime, LocalDateTime startTime, BigDecimal maxSpeed,
             BigDecimal minSpeed, BigDecimal avgSpeedLimit, Integer speedingCount, BigDecimal averageSpeedingAmount,
-            Integer carCount, Integer camioneteCount, Integer onibusCount, Integer vanCount,
+            BigDecimal readingFrequency, Integer carCount, Integer camioneteCount, Integer onibusCount, Integer vanCount,
             Integer caminhaoGrandeCount,
             Integer motoCount, Integer indefinidoCount) {
         this.timeInterval = timeInterval;
@@ -35,6 +36,7 @@ public class ReadingGroupAggregate {
         this.avgSpeedLimit = avgSpeedLimit;
         this.speedingCount = speedingCount;
         this.averageSpeedingAmount = averageSpeedingAmount;
+        this.readingFrequency = readingFrequency;
         this.vehicleTypeCounts.put("Indefinido", indefinidoCount);
         this.vehicleTypeCounts.put("Carro", carCount);
         this.vehicleTypeCounts.put("Camionete", camioneteCount);
@@ -126,6 +128,18 @@ public class ReadingGroupAggregate {
 
     public Integer getTotalReadings() {
         return totalReadings;
+    }
+
+    public BigDecimal getReadingFrequency() {
+        return readingFrequency;
+    }
+
+    public void setReadingFrequency(BigDecimal readingFrequency) {
+        this.readingFrequency = readingFrequency;
+    }
+
+    public void setVehicleTypeCounts(Map<String, Integer> vehicleTypeCounts) {
+        this.vehicleTypeCounts = vehicleTypeCounts;
     }
 
 }
