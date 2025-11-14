@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.Comparator;
-import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +22,8 @@ import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
 import com.sqlutions.api_4_semestre_backend.repository.RegionRepository;
 
 /**
- * Implementação do serviço responsável pelo cálculo dos índices de segurança e tráfego
+ * Implementação do serviço responsável pelo cálculo dos índices de segurança e
+ * tráfego
  * com base nas leituras de velocidade dos radares.
  * * <p>
  * Esta classe foi refatorada para usar queries agregadas de alta performance (via ReadingRepositoryAggregates)
