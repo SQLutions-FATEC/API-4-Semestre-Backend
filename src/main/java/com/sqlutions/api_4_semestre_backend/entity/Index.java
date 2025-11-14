@@ -28,7 +28,8 @@ public class Index {
         this.endTime = endTime;
     }
 
-    public Index(Integer securityIndex, Integer trafficIndex, Integer volumeIndex,LocalDateTime startTime, LocalDateTime endTime) {
+    public Index(Integer securityIndex, Integer trafficIndex, Integer volumeIndex, LocalDateTime startTime,
+            LocalDateTime endTime) {
         this.securityIndex = securityIndex;
         this.trafficIndex = trafficIndex;
         this.volumeIndex = volumeIndex;
@@ -61,7 +62,7 @@ public class Index {
     }
 
     public Integer getCombinedIndex() {
-        return (this.trafficIndex + this.securityIndex) / 2;
+        return (this.trafficIndex + this.securityIndex + this.volumeIndex) / 3;
     }
 
 }
