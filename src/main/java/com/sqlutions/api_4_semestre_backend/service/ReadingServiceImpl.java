@@ -2,6 +2,7 @@ package com.sqlutions.api_4_semestre_backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
+import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
 import com.sqlutions.api_4_semestre_backend.entity.Radar;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
+import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.repository.RadarRepository;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
 
@@ -64,7 +66,9 @@ public class ReadingServiceImpl implements ReadingService {
     @Autowired
     private TimeService timeService;
 
+    // OBSOLETO
     @Override
+    @Deprecated
     public List<ReadingInformation> getReadingsFromLastMinutes(int minutes,
             @Nullable java.time.LocalDateTime startDate) {
 
@@ -76,7 +80,9 @@ public class ReadingServiceImpl implements ReadingService {
         return groupReadings(readings);
     }
 
+    // OBSOLETO
     @Override
+    @Deprecated
     public List<ReadingInformation> getReadingsFromLastMinutesByAddress(List<String> address, int minutes,
             @Nullable java.time.LocalDateTime startDate) {
         List<Reading> readings = readingRepository.findByRadarAddressAddressInAndDateBetween(address,
@@ -85,7 +91,9 @@ public class ReadingServiceImpl implements ReadingService {
         return groupReadings(readings);
     }
 
+    // OBSOLETO
     @Override
+    @Deprecated
     public List<ReadingInformation> getReadingsFromLastMinutesByRadar(List<String> radarIds, int minutes,
             @Nullable java.time.LocalDateTime startDate) {
         List<Reading> readings = readingRepository.findByRadarIdInAndDateBetween(radarIds,
@@ -94,7 +102,9 @@ public class ReadingServiceImpl implements ReadingService {
         return groupReadings(readings);
     }
 
+    // OBSOLETO
     @Override
+    @Deprecated
     public List<ReadingInformation> getReadingsFromLastMinutesByAddressRegion(List<String> regions, int minutes,
             @Nullable java.time.LocalDateTime startDate) {
         List<Reading> readings = readingRepository.findByRadarAddressRegionInAndDateBetween(regions,
@@ -104,24 +114,22 @@ public class ReadingServiceImpl implements ReadingService {
     }
 
     /**
-     * Groups a list of {@link Reading} objects into time-based buckets depending on
-     * the sample period and returns them as {@link ReadingInformation} objects.
+     * Agrupa uma lista de {@link Reading} em "grupos" (intervalos) baseados no tempo, de acordo com o período amostral,
+     * e retorna-os como objetos {@link ReadingInformation}.
      * <p>
-     * The grouping strategy is determined by the duration between the earliest and
-     * latest reading:
+     * A estratégia de agrupamento é determinada pela duração entre a leitura mais antiga e a mais recente:
      * <ul>
-     * <li>If the period is less than 1 hour, readings are grouped into 10-minute
-     * intervals.</li>
-     * <li>If the period is less than 1 day, readings are grouped by hour.</li>
-     * <li>If the period is more than 3 days, readings are grouped by day.</li>
+     * <li>Se o período for menor que 1 hora, as leituras são agrupadas em intervalos de 10 minutos.</li>
+     * <li>Se o período for menor que 1 dia, as leituras são agrupadas por hora.</li>
+     * <li>Se o período for maior que 3 dias, as leituras são agrupadas por dia.</li>
      * </ul>
-     *
-     * @param readings the list of {@link Reading} objects to group; must not be
-     *                 null and should contain at least one element
-     * @return a list of {@link ReadingInformation} objects, each containing
-     *         aggregated information for a time bucket
+     * @deprecated Use {@link ReadingRepositoryAggregates} para consultas agregadas diretamente no banco de dados.
+     * @param readings a lista de {@link Reading} a ser agrupada; não deve ser nula e deve conter pelo menos um elemento
+     * @return uma lista de {@link ReadingInformation}, cada item contendo informações agregadas para um intervalo de tempo
      */
+    // OBSOLETO
     @Override
+    @Deprecated
     public List<ReadingInformation> groupReadings(List<Reading> readings) {
         if (readings == null || readings.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Readings list is null or empty");
@@ -151,7 +159,7 @@ public class ReadingServiceImpl implements ReadingService {
             readings.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
             groupedReadings = new java.util.ArrayList<>(
                     readings.stream()
-                    
+
                             .collect(java.util.stream.Collectors.groupingBy(r -> r.getDate().withMinute(0).withSecond(0)
                                     .withNano(0).withHour(r.getDate().getHour())))
                             .values());
@@ -215,4 +223,91 @@ public class ReadingServiceImpl implements ReadingService {
         return null;
     }
 
+        /**
+         * Recupera uma leitura agregada (um único objeto {@link ReadingGroupAggregate}) para um intervalo de tempo
+         * determinado pelos últimos {@code minutes} minutos até o momento corrente do sistema.
+         *
+         * O método:
+         * - Obtém o instante final ("endDate") usando {@code timeService.getCurrentTimeClampedToDatabase()}.
+         * - Calcula o instante inicial ("startDate") subtraindo {@code minutes} do instante final.
+         * - Invoca {@code readingRepository.findSingleAggregatedReading(startDate, endDate, ...)} passando
+         *   filtros opcionais para identificadores de radares, endereços e regiões.
+         *
+         * Observações:
+         * - Os parâmetros {@code radarIds}, {@code addresses} e {@code regionIds} são opcionais; quando nulos,
+         *   não são aplicados filtros correspondentes.
+         * - Espera-se que {@code minutes} seja um valor positivo representando a janela em minutos.
+         *
+         * @param minutes intervalo em minutos para agregação (janela de tempo até o momento corrente)
+         * @param radarIds lista opcional de IDs de radar para filtrar os dados; pode ser {@code null}
+         * @param addresses lista opcional de endereços para filtrar os radares; pode ser {@code null}
+         * @param regionIds lista opcional de IDs de região para filtrar os radares; pode ser {@code null}
+         * @return um {@link ReadingGroupAggregate} contendo as métricas agregadas no período especificado
+         * @throws org.springframework.web.server.ResponseStatusException com status {@code 404 NOT_FOUND}
+         *         se o repositório não retornar nenhuma agregação (resultado nulo)
+         */
+    @Override
+    public ReadingGroupAggregate getReadings(int minutes, @Nullable List<String> radarIds, @Nullable List<String> addresses,
+            @Nullable List<String> regionIds) {
+        LocalDateTime endDate = timeService.getCurrentTimeClampedToDatabase();
+        LocalDateTime startDate = endDate.minusMinutes(minutes);
+        ReadingGroupAggregate reading = readingRepository.findSingleAggregatedReading(
+                startDate,
+                endDate,
+                Optional.ofNullable(radarIds),
+                Optional.ofNullable(addresses),
+                Optional.ofNullable(regionIds));
+        if (reading == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Readings list is null or empty");
+        }
+        return reading;
+    }
+
+    /**
+     * Recupera uma série temporal de leituras agregadas ({@link ReadingGroupAggregate}) para uma janela
+     * de tempo composta pelos últimos {@code minutes} minutos terminando em {@code timestamp} (ou no momento
+     * corrente do sistema se {@code timestamp} for {@code null}).
+     *
+     * O método:
+     * - Determina o instante final ("endDate") usando {@code timestamp} quando fornecido, caso contrário
+     *   usa {@code timeService.getCurrentTimeClampedToDatabase()}.
+     * - Calcula o instante inicial ("startDate") subtraindo {@code minutes} do instante final.
+     * - Invoca {@code readingRepository.findAggregatedReadingSeries(startDate, endDate, ...)} passando
+     *   filtros opcionais para identificadores de radares, endereços e regiões.
+     *
+     * Observações:
+     * - Os parâmetros {@code radarIds}, {@code addresses} e {@code regionIds} são opcionais; quando nulos,
+     *   não são aplicados filtros correspondentes.
+     * - {@code timestamp} pode ser {@code null}, caso em que o ponto final da janela será o tempo atual
+     *   "clamped" do serviço de tempo.
+     * - Espera-se que {@code minutes} seja um valor positivo que define a duração da janela.
+     *
+     * @param minutes duração da janela em minutos (até {@code timestamp} ou até o tempo atual quando {@code null})
+     * @param timestamp instante final opcional para a série; quando {@code null} usa-se o tempo atual "clamped"
+     * @param radarIds lista opcional de IDs de radar para filtrar os dados; pode ser {@code null}
+     * @param addresses lista opcional de endereços para filtrar os radares; pode ser {@code null}
+     * @param regionIds lista opcional de IDs de região para filtrar os radares; pode ser {@code null}
+     * @return uma lista de {@link ReadingGroupAggregate} representando a série temporal agregada no período solicitado
+     * @throws org.springframework.web.server.ResponseStatusException com status {@code 404 NOT_FOUND}
+     *         se o repositório retornar uma lista vazia (nenhuma agregação encontrada)
+     */
+    @Override
+    public List<ReadingGroupAggregate> getReadingSeries(int minutes, @Nullable LocalDateTime timestamp, @Nullable List<String> radarIds,
+            @Nullable List<String> addresses,
+            @Nullable List<String> regionIds) {
+        LocalDateTime endDate = timestamp != null ? timestamp : timeService.getCurrentTimeClampedToDatabase();
+        LocalDateTime startDate = endDate.minusMinutes(minutes);
+        List<ReadingGroupAggregate> readings = readingRepository.findAggregatedReadingSeries(
+                startDate,
+                endDate,
+                Optional.ofNullable(radarIds),
+                Optional.ofNullable(addresses),
+                Optional.ofNullable(regionIds));
+        if (readings.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Readings list is null or empty");
+        }
+        return readings;
+    }
 }
