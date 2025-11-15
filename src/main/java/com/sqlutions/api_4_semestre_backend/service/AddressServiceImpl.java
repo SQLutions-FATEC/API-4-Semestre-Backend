@@ -1,17 +1,32 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
-import com.sqlutions.api_4_semestre_backend.entity.Address;
-import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.sqlutions.api_4_semestre_backend.dto.AddressHeatMap;
+import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
+import com.sqlutions.api_4_semestre_backend.entity.Address;
+import com.sqlutions.api_4_semestre_backend.entity.Index;
+import com.sqlutions.api_4_semestre_backend.projections.AddressGeoData;
+import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
+import com.sqlutions.api_4_semestre_backend.repository.ReadingRepositoryAggregates;
+
 
 @Service
 public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private ReadingRepositoryAggregates readingRepository;
+
+    @Autowired
+    private IndexServiceImpl indexService;
 
     @Override
     public Address saveAddress(Address address) {
@@ -39,5 +54,48 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public void deleteAddress(Long id) {
         addressRepository.deleteById(id);
+    }
+
+    @Override
+    public List<AddressHeatMap> listAddressHeatMapData(int minutes, java.time.LocalDateTime timestamp) {
+        java.time.LocalDateTime timeEnd = timestamp;
+        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+
+        List<AddressHeatMap> addressesHeatMap = new ArrayList<>();
+        List<AddressGeoData> geoDataList = addressRepository.ListAll();
+
+        for (AddressGeoData geoData : geoDataList) {
+            AddressHeatMap addressHeatMap = new AddressHeatMap("","",0,0,0);
+            addressHeatMap.setNomeEndereco(geoData.getNomeEndereco());
+
+            
+
+            ReadingGroupAggregate aggregate = readingRepository.findSingleAggregatedReading(
+                    timeStart, timeEnd, Optional.empty(), Optional.of(List.of(geoData.getNomeEndereco())), Optional.empty()
+            );
+
+            Index index;
+
+            if (aggregate == null || aggregate.getTotalReadings() == 0) {
+            index =new Index(1, 1, null, null); // Retorna índices padrão se não houver dados
+
+        }else {
+            index = indexService.getIndexFromAggregate(aggregate);
+        }
+
+            addressHeatMap.setSecurityIndex(index.getSecurityIndex());
+            addressHeatMap.setTrafficIndex(index.getTrafficIndex());
+            addressHeatMap.setOverallIndex(index.getCombinedIndex());
+            addressHeatMap.setAreaRuaGeoJson(geoData.getAreaRuaGeoJson());
+            
+
+            addressesHeatMap.add(addressHeatMap);
+            
+
+        }
+
+        
+
+        return addressesHeatMap;
     }
 }
