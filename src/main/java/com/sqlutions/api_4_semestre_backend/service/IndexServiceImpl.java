@@ -13,13 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-// --- DTO Novo ---
 import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
 import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
-// --- Obsoletos (Removidos) ---
-// import com.sqlutions.api_4_semestre_backend.entity.Reading;
-// import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.entity.Region;
 import com.sqlutions.api_4_semestre_backend.entity.RegionMap;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
@@ -136,7 +132,7 @@ public class IndexServiceImpl implements IndexService {
     /**
      * Método helper principal para converter um Aggregate em um Index.
      */
-    private Index getIndexFromAggregate(ReadingGroupAggregate aggregate) {
+    public Index getIndexFromAggregate(ReadingGroupAggregate aggregate) {
         if (aggregate == null || aggregate.getTotalReadings() == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma leitura encontrada para este período ou filtro.");
         }
