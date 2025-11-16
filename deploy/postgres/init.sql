@@ -29,6 +29,8 @@ CREATE TABLE radar (
     id_end INT NOT NULL, --refere-se ao id do endereço
     localizacao GEOMETRY(Point, 4326),
     vel_reg INT NOT NULL,
+    carros_min_med NUMERIC(10, 2),
+    carros_min_max NUMERIC(10, 2),
     CONSTRAINT fk_radar_endereco FOREIGN KEY (id_end) REFERENCES endereco(id)
 );
 

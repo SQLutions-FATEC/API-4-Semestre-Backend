@@ -185,9 +185,60 @@ def main_etl_process():
         start_time_index = time.time()
         print("⏳ Criando índice na coluna 'dat_hora' para acelerar consultas...")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_leitura_dat_hora ON leitura (dat_hora);")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_leitura_rad_time ON leitura (id_rad, dat_hora);")
         conn.commit()
-        print(f"✅ Índice 'idx_leitura_dat_hora' criado com sucesso em {time.time() - start_time_index:.2f} segundos.")
+        print(f"✅ Índices criados com sucesso em {time.time() - start_time_index:.2f} segundos.")
 
+        # --- Etapa 2e: Trafic aggregates calculation ---
+        print("\n--- Etapa 2e: Cálculo de Agregados de Tráfego ---")
+        start_time_agg = time.time()
+        
+        # This query calculates the aggregates and updates the 'radar' table in one go.
+        update_query = """
+        WITH
+        -- Step 1: Count vehicles in minute buckets for EACH RADAR
+        MinuteBuckets AS (
+            SELECT
+                l.id_rad,
+                date_trunc('minute', l.dat_hora) AS time_bucket,
+                COUNT(l.id) AS vehicle_count_per_min
+            FROM
+                leitura AS l
+            GROUP BY
+                l.id_rad, time_bucket
+        ),
+        
+        -- Step 2: Aggregate these buckets for each radar to get AVG and MAX rates
+        RadarAggregates AS (
+            SELECT
+                id_rad,
+                ROUND(AVG(vehicle_count_per_min)) AS avg_volume,
+                MAX(vehicle_count_per_min) AS max_volume
+            FROM
+                MinuteBuckets
+            GROUP BY
+                id_rad
+        )
+        
+        -- Step 3: Update the radar table from this aggregate data
+        UPDATE
+            radar
+        SET
+            carros_min_med = agg.avg_volume,
+            carros_min_max = agg.max_volume
+        FROM
+            RadarAggregates AS agg
+        WHERE
+            radar.id = agg.id_rad;
+        """
+        
+        try:
+            cur.execute(update_query)
+            conn.commit()
+            print(f"✅ Agregados de tráfego (AVG, MAX) atualizados na tabela 'radar' em {time.time() - start_time_agg:.2f} segundos.")
+        except Exception as e:
+            print(f"❌ Erro ao calcular e atualizar agregados: {e}")
+            conn.rollback()
         # --- Etapa 3: Cleanup ---
         print("\n--- Etapa 3: Limpeza ---")
         cur.execute("DROP TABLE public.staging_leitura;")
