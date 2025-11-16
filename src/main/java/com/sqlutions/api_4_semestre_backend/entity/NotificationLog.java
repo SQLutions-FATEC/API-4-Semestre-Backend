@@ -17,53 +17,50 @@ public class NotificationLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
-    private String recipient;
-    private boolean success;
-    private LocalDateTime timestamp;
+    private String messageText;
+    private String chatId;
 
-    @Column(length = 500)
+    private boolean success;
+
+    @Column(columnDefinition = "TEXT")
     private String errorDetails;
 
-    private String indexType;  
+    private String indexType;
     private Integer indexValue;
+
+    private LocalDateTime startAt;
+    private LocalDateTime completedAt;
 
     public NotificationLog() {}
 
-    public NotificationLog(String message, String recipient, boolean success, String errorDetails,
+    public NotificationLog(String messageText, String chatId, boolean success, String errorDetails,
                            String indexType, Integer indexValue) {
-        this.message = message;
-        this.recipient = recipient;
+        this.messageText = messageText;
+        this.chatId = chatId;
         this.success = success;
         this.errorDetails = errorDetails;
         this.indexType = indexType;
         this.indexValue = indexValue;
-        this.timestamp = LocalDateTime.now().minusHours(3);
-
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getMessageText() {
+        return messageText;
     }
 
-    public String getMessage() {
-        return message;
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public String getChatId() {
+        return chatId;
     }
 
-    public String getRecipient() {
-        return recipient;
-    }
-
-    public void setRecipient(String recipient) {
-        this.recipient = recipient;
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 
     public boolean isSuccess() {
@@ -72,14 +69,6 @@ public class NotificationLog {
 
     public void setSuccess(boolean success) {
         this.success = success;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
     }
 
     public String getErrorDetails() {
@@ -104,5 +93,21 @@ public class NotificationLog {
 
     public void setIndexValue(Integer indexValue) {
         this.indexValue = indexValue;
+    }
+
+    public LocalDateTime getStartAt() {
+        return startAt;
+    }
+
+    public void setStartAt(LocalDateTime startAt) {
+        this.startAt = startAt;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
     }
 }
