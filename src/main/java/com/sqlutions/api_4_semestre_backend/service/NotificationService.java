@@ -20,14 +20,27 @@ public class NotificationService {
     private String chatId;
 
     private final NotificationLogRepository logRepository;
+    private final TimeService timeService;
 
-    public NotificationService(NotificationLogRepository logRepository) {
+    public NotificationService(NotificationLogRepository logRepository, TimeService timeService) {
         this.logRepository = logRepository;
+        this.timeService = timeService;
     }
 
     public void sendAlert(String messageText, String indexType, Integer indexValue) {
-        boolean success = false;
-        String errorDetails = null;
+
+        NotificationLog log = new NotificationLog(
+                messageText,
+                chatId,
+                false,
+                null,
+                indexType,
+                indexValue
+        );
+
+        log.setStartAt(timeService.getCurrentTimeClampedToDatabase());
+
+        System.out.println("Enviando notificação...");
 
         try {
             String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
@@ -43,21 +56,21 @@ public class NotificationService {
             HttpEntity<String> request = new HttpEntity<>(json, headers);
             new RestTemplate().postForObject(url, request, String.class);
 
-            success = true;
-            System.out.println("✅ Notificação enviada via Telegram com sucesso!");
+            log.setSuccess(true);
+
+            System.out.println("✅ Notificação enviada com sucesso");
         } catch (Exception e) {
-            errorDetails = e.getMessage();
-            System.err.println("❌ Falha ao enviar notificação via Telegram: " + errorDetails);
+            log.setErrorDetails(e.getMessage());
+            log.setSuccess(false);
+
+            System.out.println("❌ Erro ao enviar notificação: " + e.getMessage());
         }
 
-        NotificationLog log = new NotificationLog(
-                messageText,
-                chatId,
-                success,
-                errorDetails,
-                indexType,
-                indexValue
-        );
+        log.setCompletedAt(timeService.getCurrentTimeClampedToDatabase());
         logRepository.save(log);
+
+        System.out.println("Log salvo no banco de dados");
+        System.out.println("Iniciado em: " + log.getStartAt());
+        System.out.println("Finalizado em: " + log.getCompletedAt());
     }
 }
