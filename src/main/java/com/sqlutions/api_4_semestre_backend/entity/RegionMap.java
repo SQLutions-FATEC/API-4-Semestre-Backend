@@ -6,20 +6,22 @@ import java.util.Map;
 import org.locationtech.jts.geom.Polygon;
 
 public class RegionMap {
-    
+
     private String regionName;
     private Polygon areaRegiao;
     private Integer trafficIndex;
     private Integer securityIndex;
+    private Integer volumeIndex;
     private Integer overallIndex;
     private Map<String, Integer> vehicleTypeCounts = new HashMap<>();
 
-
-    public RegionMap(String regionName, Polygon areaRegiao, Integer trafficIndex, Integer securityIndex, Integer overallIndex, Map<String, Integer> vehicleTypeCounts) {
+    public RegionMap(String regionName, Polygon areaRegiao, Integer trafficIndex, Integer securityIndex,
+            Integer volumeIndex, Integer overallIndex, Map<String, Integer> vehicleTypeCounts) {
         this.regionName = regionName;
         this.areaRegiao = areaRegiao;
         this.trafficIndex = trafficIndex;
         this.securityIndex = securityIndex;
+        this.volumeIndex = volumeIndex;
         this.overallIndex = overallIndex;
         this.vehicleTypeCounts = vehicleTypeCounts;
     }
@@ -54,6 +56,14 @@ public class RegionMap {
 
     public void setSecurityIndex(Integer securityIndex) {
         this.securityIndex = securityIndex;
+    }
+
+    public Integer getVolumeIndex() {
+        return volumeIndex;
+    }
+
+    public void setVolumeIndex(Integer volumeIndex) {
+        this.volumeIndex = volumeIndex;
     }
 
     public Integer getOverallIndex() {
