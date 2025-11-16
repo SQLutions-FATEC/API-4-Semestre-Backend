@@ -16,10 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sqlutions.api_4_semestre_backend.dto.AddressHeatMap;
 import com.sqlutions.api_4_semestre_backend.entity.Address;
 import com.sqlutions.api_4_semestre_backend.service.AddressService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.sqlutions.api_4_semestre_backend.service.TimeService;
 
 @RestController
 @RequestMapping("/address")
+@Tag(name = "Address", description = "Endpoints for managing addresses")
 public class AddressController {
 
     @Autowired
@@ -29,11 +35,15 @@ public class AddressController {
     private TimeService timeService;
 
     @PostMapping
+    @Operation(summary = "Create a new address")
+    @ApiResponse(responseCode = "200", description = "Address created successfully")
     public Address createAddress(@RequestBody Address address) {
         return addressService.saveAddress(address);
     }
 
     @GetMapping
+    @Operation(summary = "List all addresses")
+    @ApiResponse(responseCode = "200", description = "List of addresses retrieved successfully")
     public List<Address> listAddress() {
         return addressService.listAddress();
     }
@@ -46,16 +56,25 @@ public class AddressController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get address by ID")
+    @ApiResponse(responseCode = "200", description = "Address retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "Address not found")
     public Address searchAddress(@PathVariable Long id) {
         return addressService.searchAddressById(id);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update an existing address")
+    @ApiResponse(responseCode = "200", description = "Address updated successfully")
+    @ApiResponse(responseCode = "404", description = "Address not found")
     public Address updateAddress(@PathVariable Long id, @RequestBody Address address) {
         return addressService.updateAddress(id, address);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete an address")
+    @ApiResponse(responseCode = "200", description = "Address deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Address not found")
     public void deleteAddress(@PathVariable Long id) {
         addressService.deleteAddress(id);
     }
