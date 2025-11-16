@@ -29,6 +29,7 @@ public class BusStopServiceImpl implements BusStopService {
 
     @Override
     public void deleteBusStop(Long id) {
+        searchBusStopById(id); // Verifica se a parada de ônibus existe
         busStopRepository.deleteById(id);
     }
 }
