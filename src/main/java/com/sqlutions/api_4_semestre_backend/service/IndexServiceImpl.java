@@ -251,16 +251,16 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public List<RegionMap> getRegionsIndex(int minutes, java.time.LocalDateTime timestamp) {
-        java.time.LocalDateTime timeEnd = timestamp;
-        java.time.LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
+    public List<RegionMap> getRegionsIndex(int minutes, LocalDateTime timestamp) {
+        LocalDateTime timeEnd = timestamp;
+        LocalDateTime timeStart = timeEnd.minusMinutes(minutes);
         System.out.println("Calculando índices de todas as regiões para: " + timeStart + " até " + timeEnd);
 
         List<RegionMap> regionMaps = new ArrayList<>();
         List<Region> regions = regionRepository.findAllRegions();
 
         for (Region region : regions) {
-            RegionMap regionMap = new RegionMap("", region.getAreaRegiao(), 0, 0, 0, new HashMap<>());
+            RegionMap regionMap = new RegionMap("", region.getAreaRegiao(), 0, 0, 0, 0, new HashMap<>());
             regionMap.setRegionName(region.getNomeRegiao());
 
             ReadingGroupAggregate aggregate = readingRepository.findSingleAggregatedReading(
@@ -268,15 +268,21 @@ public class IndexServiceImpl implements IndexService {
             );
             
             if (aggregate == null || aggregate.getTotalReadings() == 0) {
-                // Se não houver dados, define os índices como os melhores (1)
                 regionMap.setTrafficIndex(1);
                 regionMap.setSecurityIndex(1);
+                regionMap.setVolumeIndex(1);
                 regionMap.setOverallIndex(1);
             } else {
-                // Se houver dados, calcula os índices
-                regionMap.setTrafficIndex(getTrafficIndex(aggregate));
-                regionMap.setSecurityIndex(getSecurityIndex(aggregate));
-                Integer overallIndex = Math.round((regionMap.getTrafficIndex() + regionMap.getSecurityIndex()) / 2.0f);
+                Integer traffic = getTrafficIndex(aggregate);
+                Integer security = getSecurityIndex(aggregate);
+                Integer volume = getVolumeIndex(aggregate);
+
+                regionMap.setTrafficIndex(traffic);
+                regionMap.setSecurityIndex(security);
+                regionMap.setVolumeIndex(volume);
+
+                // mantém o comportamento original: overall = média entre traffic e security
+                Integer overallIndex = Math.round((traffic + security) / 2.0f);
                 regionMap.setOverallIndex(overallIndex);
 
                 regionMap.setVehicleTypeCounts(aggregate.getVehicleTypeCounts());
