@@ -1,11 +1,22 @@
 package com.sqlutions.api_4_semestre_backend.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sqlutions.api_4_semestre_backend.dto.AddressHeatMap;
 import com.sqlutions.api_4_semestre_backend.entity.Address;
 import com.sqlutions.api_4_semestre_backend.service.AddressService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import com.sqlutions.api_4_semestre_backend.service.TimeService;
 
 @RestController
 @RequestMapping("/address")
@@ -13,6 +24,9 @@ public class AddressController {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private TimeService timeService;
 
     @PostMapping
     public Address createAddress(@RequestBody Address address) {
@@ -22,6 +36,13 @@ public class AddressController {
     @GetMapping
     public List<Address> listAddress() {
         return addressService.listAddress();
+    }
+
+    @GetMapping("/heatmap")
+    public List<AddressHeatMap> listAddressHeatMapData(
+            @RequestParam(defaultValue="20") int minutes,
+            @RequestParam(required = false) java.time.LocalDateTime timestamp) {
+        return addressService.listAddressHeatMapData(minutes, timestamp == null ? timeService.getCurrentTimeClampedToDatabase() : timestamp);
     }
 
     @GetMapping("/{id}")
