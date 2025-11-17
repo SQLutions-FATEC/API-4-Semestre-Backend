@@ -1,5 +1,12 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +22,8 @@ import com.sqlutions.api_4_semestre_backend.projections.AddressGeoData;
 import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepositoryAggregates;
 
+import com.sqlutions.api_4_semestre_backend.entity.Address;
+import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -41,7 +50,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public Address searchAddressById(Long id) {
         return addressRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado."));
     }
 
     @Override
@@ -53,6 +62,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void deleteAddress(Long id) {
+        searchAddressById(id); // Verifica se o endereço existe
         addressRepository.deleteById(id);
     }
 

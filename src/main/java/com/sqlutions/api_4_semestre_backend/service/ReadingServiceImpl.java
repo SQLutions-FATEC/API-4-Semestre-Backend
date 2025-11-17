@@ -247,10 +247,11 @@ public class ReadingServiceImpl implements ReadingService {
          *         se o repositório não retornar nenhuma agregação (resultado nulo)
          */
     @Override
-    public ReadingGroupAggregate getReadings(int minutes, @Nullable List<String> radarIds, @Nullable List<String> addresses,
+    public ReadingGroupAggregate getReadings(int minutes, @Nullable LocalDateTime timestamp, @Nullable List<String> radarIds, @Nullable List<String> addresses,
             @Nullable List<String> regionIds) {
-        LocalDateTime endDate = timeService.getCurrentTimeClampedToDatabase();
+        LocalDateTime endDate = timestamp != null ? timestamp : timeService.getCurrentTimeClampedToDatabase();
         LocalDateTime startDate = endDate.minusMinutes(minutes);
+        System.out.println("Fetching aggregated readings from " + startDate + " to " + endDate);
         ReadingGroupAggregate reading = readingRepository.findSingleAggregatedReading(
                 startDate,
                 endDate,
