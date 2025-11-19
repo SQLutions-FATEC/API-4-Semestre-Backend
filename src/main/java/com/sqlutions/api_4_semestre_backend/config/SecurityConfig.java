@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .requestMatchers("/time").permitAll()
                 .requestMatchers("/regions").permitAll()
                 .requestMatchers("/index").permitAll()
-                .requestMatchers("/reading/series").permitAll()
+                
                 .requestMatchers("/radars").permitAll() 
                 .requestMatchers("/address/heatmap").permitAll()
 
