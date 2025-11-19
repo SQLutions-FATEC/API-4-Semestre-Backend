@@ -54,6 +54,57 @@ public class IndexServiceImpl implements IndexService {
     // @Autowired
     // private ReadingService readingService;
 
+    private Integer getVolumeIndex(ReadingGroupAggregate aggregate) {
+
+    if (aggregate == null ||
+        aggregate.getTotalReadings() == 0 ||
+        aggregate.getStartTime() == null ||
+        aggregate.getEndTime() == null ||
+        aggregate.getAvgCarsPerMinute() == null ||  
+        aggregate.getMaxCarsPerMinute() == null) {  
+
+        return 1;
+    }
+
+    int total = aggregate.getTotalReadings();
+
+    long durationSeconds = Duration.between(
+            aggregate.getStartTime(),
+            aggregate.getEndTime()
+    ).getSeconds();
+
+    if (durationSeconds <= 0) {
+        return 1;
+    }
+
+    double durationMinutes = durationSeconds / 60.0;
+
+    // Volume atual do intervalo
+    double currentVolume = total / durationMinutes;
+
+    // Valores referenciais do radar
+    double radarAvg = aggregate.getAvgCarsPerMinute().doubleValue(); // carros_min_med
+    double radarMax = aggregate.getMaxCarsPerMinute().doubleValue(); // carros_min_max
+
+    // Segurança
+    if (radarMed <= 0 || radarMax <= 0) {
+        return 1;
+    }
+
+    // Define aux — remédia simples (harmônica)
+    double avgVolume = 2.0 / ((1.0 / currentVolume) + (1.0 / radarMed));
+    double maxVolume = 2.0 / ((1.0 / currentVolume) + (1.0 / radarMax));
+
+    double effectiveMax = maxVolume;
+    double ratio = currentVolume / effectiveMax;
+
+    // Índice final entre 1 e 5
+    int index = (int) Math.ceil(Math.max(0, Math.min(1, ratio)) * 5);
+
+    return index;
+}
+
+
     /**
      * Calcula o índice de segurança a partir de dados pré-agregados.
      * * @param aggregate O DTO contendo os dados agregados do banco.
