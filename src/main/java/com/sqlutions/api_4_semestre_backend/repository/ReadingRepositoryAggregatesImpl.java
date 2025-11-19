@@ -38,7 +38,9 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Van')       AS vanCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Caminhão grande') AS caminhãoGrandeCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Moto')      AS motoCount,
-                COUNT(r.id) FILTER (WHERE r.tip_vei = 'Indefinido')  AS indefinidoCount
+                COUNT(r.id) FILTER (WHERE r.tip_vei = 'Indefinido')  AS indefinidoCount,
+                rd.carros_min_med AS avgCarsPerMinute,
+                rd.carros_min_max AS maxCarsPerMinute
             """;
     
     private static final String QUERY_FROM_JOINS = """
