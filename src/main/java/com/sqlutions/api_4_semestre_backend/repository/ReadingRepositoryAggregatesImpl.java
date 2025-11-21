@@ -38,7 +38,9 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Van')       AS vanCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Caminhão grande') AS caminhãoGrandeCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Moto')      AS motoCount,
-                COUNT(r.id) FILTER (WHERE r.tip_vei = 'Indefinido')  AS indefinidoCount
+                COUNT(r.id) FILTER (WHERE r.tip_vei = 'Indefinido')  AS indefinidoCount,
+                rd.carros_min_med AS avgCarsPerMinute,
+                rd.carros_min_max AS maxCarsPerMinute
             """;
     
     private static final String QUERY_FROM_JOINS = """
@@ -55,18 +57,24 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
             Optional<List<String>> addressNames,
             Optional<List<String>> regions) {
 
+        if (!radarIds.isEmpty() || !addressNames.isEmpty() || !regions.isEmpty()) {
+            sql.append(" AND (1=0 ");
+        }
         radarIds.ifPresent(ids -> {
             if (!ids.isEmpty())
-                sql.append(" AND rd.id IN (:radarIds) ");
+                sql.append(" OR rd.id IN (:radarIds) ");
         });
         addressNames.ifPresent(names -> {
             if (!names.isEmpty())
-                sql.append(" AND a.ende IN (:addressNames) ");
+                sql.append(" OR a.ende IN (:addressNames) ");
         });
         regions.ifPresent(regs -> {
             if (!regs.isEmpty())
-                sql.append(" AND a.regiao IN (:regions) ");
+                sql.append(" OR a.regiao IN (:regions) ");
         });
+        if (!radarIds.isEmpty() || !addressNames.isEmpty() || !regions.isEmpty()) {
+            sql.append(" ) ");
+        }
     }
 
     /**

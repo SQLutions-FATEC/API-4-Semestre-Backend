@@ -13,13 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-// --- DTO Novo ---
 import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
 import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.entity.Reading;
-// --- Obsoletos (Removidos) ---
-// import com.sqlutions.api_4_semestre_backend.entity.Reading;
-// import com.sqlutions.api_4_semestre_backend.entity.ReadingInformation;
 import com.sqlutions.api_4_semestre_backend.entity.Region;
 import com.sqlutions.api_4_semestre_backend.entity.RegionMap;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepository;
@@ -64,6 +60,57 @@ public class IndexServiceImpl implements IndexService {
     // --- ReadingService não é mais necessário e foi removido ---
     // @Autowired
     // private ReadingService readingService;
+
+    private Integer getVolumeIndex(ReadingGroupAggregate aggregate) {
+
+    if (aggregate == null ||
+        aggregate.getTotalReadings() == 0 ||
+        aggregate.getStartTime() == null ||
+        aggregate.getEndTime() == null ||
+        aggregate.getAvgCarsPerMinute() == null ||  
+        aggregate.getMaxCarsPerMinute() == null) {  
+
+        return 1;
+    }
+
+    int total = aggregate.getTotalReadings();
+
+    long durationSeconds = Duration.between(
+            aggregate.getStartTime(),
+            aggregate.getEndTime()
+    ).getSeconds();
+
+    if (durationSeconds <= 0) {
+        return 1;
+    }
+
+    double durationMinutes = durationSeconds / 60.0;
+
+    // Volume atual do intervalo
+    double currentVolume = total / durationMinutes;
+
+    // Valores referenciais do radar
+    double radarAvg = aggregate.getAvgCarsPerMinute().doubleValue(); // carros_min_med
+    double radarMax = aggregate.getMaxCarsPerMinute().doubleValue(); // carros_min_max
+
+    // Segurança
+    if (radarMed <= 0 || radarMax <= 0) {
+        return 1;
+    }
+
+    // Define aux — remédia simples (harmônica)
+    double avgVolume = 2.0 / ((1.0 / currentVolume) + (1.0 / radarMed));
+    double maxVolume = 2.0 / ((1.0 / currentVolume) + (1.0 / radarMax));
+
+    double effectiveMax = maxVolume;
+    double ratio = currentVolume / effectiveMax;
+
+    // Índice final entre 1 e 5
+    int index = (int) Math.ceil(Math.max(0, Math.min(1, ratio)) * 5);
+
+    return index;
+}
+
 
     /**
      * Calcula o índice de volume (1 a 5) usando dados agregados.
@@ -199,7 +246,7 @@ public class IndexServiceImpl implements IndexService {
     /**
      * Método helper principal para converter um Aggregate em um Index.
      */
-    private Index getIndexFromAggregate(ReadingGroupAggregate aggregate) {
+    public Index getIndexFromAggregate(ReadingGroupAggregate aggregate) {
         if (aggregate == null || aggregate.getTotalReadings() == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Nenhuma leitura encontrada para este período ou filtro.");
