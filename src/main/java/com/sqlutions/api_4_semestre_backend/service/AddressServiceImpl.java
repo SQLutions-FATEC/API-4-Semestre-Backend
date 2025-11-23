@@ -85,6 +85,7 @@ public class AddressServiceImpl implements AddressService {
 
             addressHeatMap.setSecurityIndex(index.getSecurityIndex());
             addressHeatMap.setTrafficIndex(index.getTrafficIndex());
+            addressHeatMap.setVolumeIndex(index.getVolumeIndex());
             addressHeatMap.setOverallIndex(index.getCombinedIndex());
             addressHeatMap.setAreaRuaGeoJson(geoData.getAreaRuaGeoJson());
 
