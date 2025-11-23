@@ -17,13 +17,16 @@ public class ReadingGroupAggregate {
     BigDecimal avgSpeedLimit;
     Integer speedingCount;
     BigDecimal averageSpeedingAmount;
-    BigDecimal readingFrequency;
+    BigDecimal avgCarsPerMinute;
+    BigDecimal maxCarsPerMinute;
     private Map<String, Integer> vehicleTypeCounts = new HashMap<>();
 
     public ReadingGroupAggregate(LocalDateTime timeInterval, BigDecimal averageSpeed, Integer totalReadings,
             LocalDateTime endTime, LocalDateTime startTime, BigDecimal maxSpeed,
             BigDecimal minSpeed, BigDecimal avgSpeedLimit, Integer speedingCount, BigDecimal averageSpeedingAmount,
-            BigDecimal readingFrequency, Integer carCount, Integer camioneteCount, Integer onibusCount, Integer vanCount,
+            BigDecimal avgCarsPerMinute, BigDecimal maxCarsPerMinute, Integer carCount, Integer camioneteCount,
+            Integer onibusCount,
+            Integer vanCount,
             Integer caminhaoGrandeCount,
             Integer motoCount, Integer indefinidoCount) {
         this.timeInterval = timeInterval;
@@ -36,7 +39,8 @@ public class ReadingGroupAggregate {
         this.avgSpeedLimit = avgSpeedLimit;
         this.speedingCount = speedingCount;
         this.averageSpeedingAmount = averageSpeedingAmount;
-        this.readingFrequency = readingFrequency;
+        this.avgCarsPerMinute = avgCarsPerMinute;
+        this.maxCarsPerMinute = maxCarsPerMinute;
         this.vehicleTypeCounts.put("Indefinido", indefinidoCount);
         this.vehicleTypeCounts.put("Carro", carCount);
         this.vehicleTypeCounts.put("Camionete", camioneteCount);
@@ -130,12 +134,20 @@ public class ReadingGroupAggregate {
         return totalReadings;
     }
 
-    public BigDecimal getReadingFrequency() {
-        return readingFrequency;
+    public BigDecimal getAvgCarsPerMinute() {
+        return avgCarsPerMinute;
     }
 
-    public void setReadingFrequency(BigDecimal readingFrequency) {
-        this.readingFrequency = readingFrequency;
+    public BigDecimal getMaxCarsPerMinute() {
+        return maxCarsPerMinute;
+    }
+
+    public void setAvgCarsPerMinute(BigDecimal avgCarsPerMinute) {
+        this.avgCarsPerMinute = avgCarsPerMinute;
+    }
+
+    public void setMaxCarsPerMinute(BigDecimal maxCarsPerMinute) {
+        this.maxCarsPerMinute = maxCarsPerMinute;
     }
 
     public void setVehicleTypeCounts(Map<String, Integer> vehicleTypeCounts) {
