@@ -94,7 +94,6 @@ public class IndexServiceImpl implements IndexService {
         if (seconds <= 0)
             return 1;
 
-        // Volume atual (veículos por minuto REAL)
         double currentVolume = aggregate.getTotalReadings() / (seconds / 60.0);
 
         double radarAvg = aggregate.getAvgCarsPerMinute().doubleValue();
@@ -102,13 +101,10 @@ public class IndexServiceImpl implements IndexService {
         if (radarAvg <= 0)
             return 1;
 
-        // Razão do tráfego atual vs o esperado
         double ratio = currentVolume / radarAvg;
 
-        // Limitamos entre 1x e 5x
         ratio = Math.min(ratio, 5);
 
-        // Índice simples e direto
         int index = (int) Math.ceil(ratio);
 
         return Math.max(1, Math.min(5, index));
