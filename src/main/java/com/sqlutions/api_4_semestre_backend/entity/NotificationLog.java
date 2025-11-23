@@ -15,72 +15,70 @@ public class NotificationLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String messageText;
-    private String chatId;
-
-    private boolean success;
+    private Long id; 
 
     @Column(columnDefinition = "TEXT")
-    private String errorDetails;
+    private String reportText; // descrição
 
-    private String indexType;
-    private Integer indexValue;
+    private String title; // título do log
 
-    private LocalDateTime startAt;
-    private LocalDateTime completedAt;
+    private String indexType; // tipo do índice (Segurança, Trafego ou Volume)
+
+    private Integer indexValue; // valor do índice (1-5)
+
+    private LocalDateTime startedAt; 
+
+    private LocalDateTime completedAt; 
+
+    private boolean success; 
+
+    @Column(columnDefinition = "TEXT")
+    private String errorDetails; 
 
     public NotificationLog() {}
 
-    public NotificationLog(String messageText, String chatId, boolean success, String errorDetails,
-                           String indexType, Integer indexValue) {
-        this.messageText = messageText;
-        this.chatId = chatId;
-        this.success = success;
-        this.errorDetails = errorDetails;
+    public NotificationLog(
+            String reportText,
+            String title,
+            String indexType,
+            Integer indexValue,
+            LocalDateTime startedAt,
+            LocalDateTime completedAt,
+            boolean success,
+            String errorDetails
+    ) {
+        this.reportText = reportText; 
+        this.title = title;
         this.indexType = indexType;
         this.indexValue = indexValue;
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
+        this.success = success;
+        this.errorDetails = errorDetails;
     }
 
     public Long getId() {
-        return id;
+        return id; 
     }
 
-    public String getMessageText() {
-        return messageText;
+    public String getReportText() {
+        return reportText; 
     }
 
-    public void setMessageText(String messageText) {
-        this.messageText = messageText;
+    public void setReportText(String reportText) {
+        this.reportText = reportText;
     }
 
-    public String getChatId() {
-        return chatId;
+    public String getTitle() {
+        return title; 
     }
 
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getErrorDetails() {
-        return errorDetails;
-    }
-
-    public void setErrorDetails(String errorDetails) {
-        this.errorDetails = errorDetails;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getIndexType() {
-        return indexType;
+        return indexType; 
     }
 
     public void setIndexType(String indexType) {
@@ -88,26 +86,42 @@ public class NotificationLog {
     }
 
     public Integer getIndexValue() {
-        return indexValue;
+        return indexValue; 
     }
 
     public void setIndexValue(Integer indexValue) {
         this.indexValue = indexValue;
     }
 
-    public LocalDateTime getStartAt() {
-        return startAt;
+    public LocalDateTime getStartedAt() {
+        return startedAt; 
     }
 
-    public void setStartAt(LocalDateTime startAt) {
-        this.startAt = startAt;
+    public void setStartedAt(LocalDateTime startedAt) {
+        this.startedAt = startedAt;
     }
 
     public LocalDateTime getCompletedAt() {
-        return completedAt;
+        return completedAt; 
     }
 
     public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public boolean isSuccess() {
+        return success; 
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getErrorDetails() {
+        return errorDetails; 
+    }
+
+    public void setErrorDetails(String errorDetails) {
+        this.errorDetails = errorDetails;
     }
 }
