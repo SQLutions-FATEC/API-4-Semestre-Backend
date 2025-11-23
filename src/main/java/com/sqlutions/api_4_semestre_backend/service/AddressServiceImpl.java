@@ -1,18 +1,13 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sqlutions.api_4_semestre_backend.dto.AddressHeatMap;
 import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
@@ -21,9 +16,6 @@ import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.projections.AddressGeoData;
 import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepositoryAggregates;
-
-import com.sqlutions.api_4_semestre_backend.entity.Address;
-import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -75,36 +67,30 @@ public class AddressServiceImpl implements AddressService {
         List<AddressGeoData> geoDataList = addressRepository.ListAll();
 
         for (AddressGeoData geoData : geoDataList) {
-            AddressHeatMap addressHeatMap = new AddressHeatMap("","",0,0,0);
+            AddressHeatMap addressHeatMap = new AddressHeatMap("", "", 0, 0, 0);
             addressHeatMap.setNomeEndereco(geoData.getNomeEndereco());
 
-            
-
             ReadingGroupAggregate aggregate = readingRepository.findSingleAggregatedReading(
-                    timeStart, timeEnd, Optional.empty(), Optional.of(List.of(geoData.getNomeEndereco())), Optional.empty()
-            );
+                    timeStart, timeEnd, Optional.empty(), Optional.of(List.of(geoData.getNomeEndereco())),
+                    Optional.empty());
 
             Index index;
 
             if (aggregate == null || aggregate.getTotalReadings() == 0) {
-            index =new Index(1, 1, null, null); // Retorna índices padrão se não houver dados
+                index = new Index(1, 1, 1, null, null); // Retorna índices padrão se não houver dados
 
-        }else {
-            index = indexService.getIndexFromAggregate(aggregate);
-        }
+            } else {
+                index = indexService.getIndexFromAggregate(aggregate);
+            }
 
             addressHeatMap.setSecurityIndex(index.getSecurityIndex());
             addressHeatMap.setTrafficIndex(index.getTrafficIndex());
             addressHeatMap.setOverallIndex(index.getCombinedIndex());
             addressHeatMap.setAreaRuaGeoJson(geoData.getAreaRuaGeoJson());
-            
 
             addressesHeatMap.add(addressHeatMap);
-            
 
         }
-
-        
 
         return addressesHeatMap;
     }
