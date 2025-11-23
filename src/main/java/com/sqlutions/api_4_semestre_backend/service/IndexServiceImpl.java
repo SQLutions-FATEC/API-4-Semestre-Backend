@@ -61,57 +61,6 @@ public class IndexServiceImpl implements IndexService {
     // @Autowired
     // private ReadingService readingService;
 
-    private Integer getVolumeIndex(ReadingGroupAggregate aggregate) {
-
-    if (aggregate == null ||
-        aggregate.getTotalReadings() == 0 ||
-        aggregate.getStartTime() == null ||
-        aggregate.getEndTime() == null ||
-        aggregate.getAvgCarsPerMinute() == null ||  
-        aggregate.getMaxCarsPerMinute() == null) {  
-
-        return 1;
-    }
-
-    int total = aggregate.getTotalReadings();
-
-    long durationSeconds = Duration.between(
-            aggregate.getStartTime(),
-            aggregate.getEndTime()
-    ).getSeconds();
-
-    if (durationSeconds <= 0) {
-        return 1;
-    }
-
-    double durationMinutes = durationSeconds / 60.0;
-
-    // Volume atual do intervalo
-    double currentVolume = total / durationMinutes;
-
-    // Valores referenciais do radar
-    double radarAvg = aggregate.getAvgCarsPerMinute().doubleValue(); // carros_min_med
-    double radarMax = aggregate.getMaxCarsPerMinute().doubleValue(); // carros_min_max
-
-    // Segurança
-    if (radarMed <= 0 || radarMax <= 0) {
-        return 1;
-    }
-
-    // Define aux — remédia simples (harmônica)
-    double avgVolume = 2.0 / ((1.0 / currentVolume) + (1.0 / radarMed));
-    double maxVolume = 2.0 / ((1.0 / currentVolume) + (1.0 / radarMax));
-
-    double effectiveMax = maxVolume;
-    double ratio = currentVolume / effectiveMax;
-
-    // Índice final entre 1 e 5
-    int index = (int) Math.ceil(Math.max(0, Math.min(1, ratio)) * 5);
-
-    return index;
-}
-
-
     /**
      * Calcula o índice de volume (1 a 5) usando dados agregados.
      * 
@@ -132,36 +81,33 @@ public class IndexServiceImpl implements IndexService {
         if (aggregate == null ||
                 aggregate.getTotalReadings() == 0 ||
                 aggregate.getStartTime() == null ||
-                aggregate.getEndTime() == null) {
-            return 1; // Sem dados → fluxo baixo
-        }
+                aggregate.getEndTime() == null ||
+                aggregate.getAvgCarsPerMinute() == null ||
+                aggregate.getMaxCarsPerMinute() == null) {
 
-        int total = aggregate.getTotalReadings();
-
-        long durationSeconds = Duration.between(aggregate.getStartTime(), aggregate.getEndTime())
-                .getSeconds();
-
-        if (durationSeconds <= 0) {
             return 1;
         }
 
-        double durationMinutes = durationSeconds / 60.0;
+        long seconds = Duration.between(
+                aggregate.getStartTime(),
+                aggregate.getEndTime()).getSeconds();
 
-        double volumeRate = total / durationMinutes; // leituras/minuto
+        if (seconds <= 0)
+            return 1;
 
-        int index;
+        double currentVolume = aggregate.getTotalReadings() / (seconds / 60.0);
 
-        if (volumeRate < 20) { // fluxo leve
-            index = 1;
-        } else if (volumeRate < 50) { // leve → moderado
-            index = 2;
-        } else if (volumeRate < 100) { // moderado
-            index = 3;
-        } else if (volumeRate < 200) { // alto
-            index = 4;
-        } else { // congestionamento / fluxo extremo
-            index = 5;
-        }
+        double radarAvg = aggregate.getAvgCarsPerMinute().doubleValue();
+        double radarMax = aggregate.getMaxCarsPerMinute().doubleValue();
+
+        if (radarAvg <= 0 || radarMax <= 0)
+            return 1;
+
+        double arithmetic = (currentVolume + radarMax) / 2.0;
+        double effectiveMax = (arithmetic + radarMax) / 2.0;
+        double ratio = currentVolume / effectiveMax;
+
+        int index = (int) Math.ceil(Math.max(0, Math.min(1, ratio)) * 5);
 
         return index;
     }
