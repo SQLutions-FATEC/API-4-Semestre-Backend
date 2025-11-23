@@ -78,39 +78,40 @@ public class IndexServiceImpl implements IndexService {
      */
     private Integer getVolumeIndex(ReadingGroupAggregate aggregate) {
 
-        if (aggregate == null ||
-                aggregate.getTotalReadings() == 0 ||
-                aggregate.getStartTime() == null ||
-                aggregate.getEndTime() == null ||
-                aggregate.getAvgCarsPerMinute() == null ||
-                aggregate.getMaxCarsPerMinute() == null) {
-
+        if (aggregate == null || aggregate.getTotalReadings() == 0 ||
+                aggregate.getStartTime() == null || aggregate.getEndTime() == null ||
+                aggregate.getAvgCarsPerMinute() == null || aggregate.getMaxCarsPerMinute() == null) {
             return 1;
         }
 
-        long seconds = Duration.between(
-                aggregate.getStartTime(),
-                aggregate.getEndTime()).getSeconds();
-
+        // Tempo em minutos
+        long seconds = Duration.between(aggregate.getStartTime(), aggregate.getEndTime()).getSeconds();
         if (seconds <= 0)
             return 1;
+        double minutes = seconds / 60.0;
 
-        double currentVolume = aggregate.getTotalReadings() / (seconds / 60.0);
+        // Leituras por minuto do período
+        double currentVolume = aggregate.getTotalReadings() / minutes;
 
+        // Média e máximo com tolerância
         double avg = aggregate.getAvgCarsPerMinute().doubleValue();
-        double max = aggregate.getMaxCarsPerMinute().doubleValue();
+        double max = Math.max(aggregate.getMaxCarsPerMinute().doubleValue(), avg * 1.2);
 
-        if (avg <= 0 || max <= 0)
-            return 1;
+        if (avg <= 0)
+            return 1; // sem dados confiáveis
 
-        if (max < avg)
-            max = avg;
-
+        // Ratio proporcional
         double ratio = (currentVolume - avg) / (max - avg);
+        ratio = Math.max(0, Math.min(1, ratio)); // garante 0 ≤ ratio ≤ 1
 
-        ratio = Math.max(0, Math.min(1, ratio));
+        // Mapeia para índice 1-5
+        int index = (int) Math.round(ratio * 4) + 1;
 
-        int index = (int) Math.ceil(ratio * 4) + 1;
+        // Garante índices mínimo/máximo fixos
+        if (index < 1)
+            index = 1;
+        if (index > 5)
+            index = 5;
 
         return index;
     }
