@@ -44,4 +44,9 @@ public class NotificationLogController {
     public void deleteLog(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @PutMapping("/{id}")
+    public NotificationLog updateLog(@PathVariable Long id, @RequestBody NotificationLog log) {
+        return service.update(id, log);
+    }
 }
