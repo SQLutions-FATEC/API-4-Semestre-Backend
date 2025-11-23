@@ -10,6 +10,7 @@ public class AddressHeatMap {
     private Integer overallIndex;
 
     public AddressHeatMap(String nomeEndereco, String areaRuaGeoJson, Integer trafficIndex, Integer securityIndex,
+            Integer volumeIndex,
             Integer overallIndex) {
         this.nomeEndereco = nomeEndereco;
         this.areaRuaGeoJson = areaRuaGeoJson;
