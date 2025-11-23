@@ -5,6 +5,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.sqlutions.api_4_semestre_backend.config.JwtUtils;
 import com.sqlutions.api_4_semestre_backend.dto.LoginResponseDto;
 import com.sqlutions.api_4_semestre_backend.entity.User;
+import com.sqlutions.api_4_semestre_backend.exception.InvalidCredentialsException;
+import com.sqlutions.api_4_semestre_backend.exception.UserNotFoundException;
 import com.sqlutions.api_4_semestre_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +29,7 @@ public class UserServiceImpl implements UserService {
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        
+
         return userRepository.save(user);
     }
 
@@ -39,7 +41,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User searchIdUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
     }
 
     @Override
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
         if (updateUser.getPassword() != null && !updateUser.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
         }
-        
+
         user.setRole(updateUser.getRole());
         return userRepository.save(user);
     }
@@ -64,14 +66,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResponseDto login(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Email não encontrado."));
-        
+                .orElseThrow(() -> new InvalidCredentialsException("Email não encontrado."));
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Senha incorreta.");
+            throw new InvalidCredentialsException("Senha incorreta.");
         }
-        
+
         String token = jwtUtils.generateJwtToken(user.getEmail(), user.getRole().name());
-        
+
         return new LoginResponseDto(token, user.getId(), user.getName(), user.getEmail(), user.getRole());
     }
 

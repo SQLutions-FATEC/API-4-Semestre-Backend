@@ -37,11 +37,11 @@ public class SecurityConfig {
         return new AuthenticationEntryPoint() {
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response,
-                               AuthenticationException authException) throws IOException {
+                    AuthenticationException authException) throws IOException {
                 response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getOutputStream().println("{ \"error\": \"Unauthorized\", \"message\": \"" 
-                    + authException.getMessage() + "\" }");
+                response.getOutputStream().println("{ \"error\": \"Unauthorized\", \"message\": \""
+                        + authException.getMessage() + "\" }");
             }
         };
     }
@@ -49,24 +49,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.disable())
-            .csrf(csrf -> csrf.disable())
-            .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint()))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/users/login").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(eh -> eh
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getOutputStream().println(
+                                    "{ \"error\": \"Forbidden\", \"message\": \"Acesso negado: você não tem permissão para acessar este recurso\" }");
+                        }))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/users/login").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
 
-                // Rotas para os dados das páginas "Home" e "Cidadão"
-                .requestMatchers("/time").permitAll()
-                .requestMatchers("/regions").permitAll()
-                .requestMatchers("/index").permitAll()
-                
-                .requestMatchers("/radars").permitAll() 
-                .requestMatchers("/address/heatmap").permitAll()
+                        // Rotas para os dados das páginas "Home" e "Cidadão"
+                        .requestMatchers("/time").permitAll()
+                        .requestMatchers("/regions").permitAll()
+                        .requestMatchers("/index").permitAll()
 
-                .anyRequest().hasRole("GESTOR")
-            );
+                        .requestMatchers("/radars").permitAll()
+                        .requestMatchers("/address/heatmap").permitAll()
+
+                        .anyRequest().hasRole("GESTOR"));
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

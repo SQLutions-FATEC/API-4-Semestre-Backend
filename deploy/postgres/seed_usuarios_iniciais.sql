@@ -18,7 +18,7 @@
 
 INSERT INTO usuario (nome, nivel, email, senha) VALUES
   ('admin', 'Gestor', 'admin@sistema.com', '$2a$10$2.lQv/U.ouYG4T0Ek6naJey3GLsZZWit.Rz3pSN57SdTfIjV9XEYa');
-
+-- Senha inserida: "admin"
 
 -- ==========================
 -- Conferência (opcional)
