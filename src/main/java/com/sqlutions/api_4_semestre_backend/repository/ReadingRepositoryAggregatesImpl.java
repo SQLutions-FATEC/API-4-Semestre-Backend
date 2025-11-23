@@ -31,7 +31,6 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 AVG(rd.vel_reg) as avgSpeedLimit,
                 COUNT(r.id) FILTER (WHERE r.vel > rd.vel_reg) AS speedingCount,
                 AVG(CASE WHEN r.vel > rd.vel_reg THEN r.vel - rd.vel_reg ELSE 0 END) AS averageSpeedingAmount,
-                (COUNT(r.id) / NULLIF(EXTRACT(EPOCH FROM (MAX(r.dat_hora) - MIN(r.dat_hora))), 0)) AS readingFrequency, -- veículos por segundo
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Carro')        AS carCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Camionete')      AS camioneteCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Ônibus') AS onibusCount,
@@ -39,8 +38,8 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Caminhão grande') AS caminhãoGrandeCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Moto')      AS motoCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Indefinido')  AS indefinidoCount,
-                AVG(DISTINCT rd.carros_min_med) AS avgCarsPerMinute,
-                AVG(DISTINCT rd.carros_min_max) AS maxCarsPerMinute
+                AVG(rd.carros_min_med) AS avgCarsPerMinute,
+                MAX(rd.carros_min_max) AS maxCarsPerMinute
             """;
 
     private static final String QUERY_FROM_JOINS = """
