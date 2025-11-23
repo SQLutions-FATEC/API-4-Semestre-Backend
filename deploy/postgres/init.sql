@@ -57,8 +57,8 @@ CREATE TABLE usuario (
 CREATE TABLE log_notificacao (
     id SERIAL PRIMARY KEY,
     id_usuario INT NOT NULL,
-    titulo VARCHAR(50) NOT NULL,
     mensagem TEXT NOT NULL,
+    texto_relatorio TEXT,
     data_emissao TIMESTAMP DEFAULT NOW(),
     data_conclusao TIMESTAMP,
     CONSTRAINT fk_log_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
