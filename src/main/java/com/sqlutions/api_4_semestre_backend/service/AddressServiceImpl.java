@@ -67,7 +67,7 @@ public class AddressServiceImpl implements AddressService {
         List<AddressGeoData> geoDataList = addressRepository.ListAll();
 
         for (AddressGeoData geoData : geoDataList) {
-            AddressHeatMap addressHeatMap = new AddressHeatMap("", "", 0, 0, 0);
+            AddressHeatMap addressHeatMap = new AddressHeatMap("", "", 0, 0, 0, 0);
             addressHeatMap.setNomeEndereco(geoData.getNomeEndereco());
 
             ReadingGroupAggregate aggregate = readingRepository.findSingleAggregatedReading(
