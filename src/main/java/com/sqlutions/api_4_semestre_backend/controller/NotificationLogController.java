@@ -16,7 +16,7 @@ import com.sqlutions.api_4_semestre_backend.service.NotificationLogService;
 
 @RestController
 @RequestMapping("/logs")
-@CrossOrigin(origins = "*")
+@CrossOrigin
 public class NotificationLogController {
 
     private final NotificationLogService service;
