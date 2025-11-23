@@ -31,6 +31,7 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 AVG(rd.vel_reg) as avgSpeedLimit,
                 COUNT(r.id) FILTER (WHERE r.vel > rd.vel_reg) AS speedingCount,
                 AVG(CASE WHEN r.vel > rd.vel_reg THEN r.vel - rd.vel_reg ELSE 0 END) AS averageSpeedingAmount,
+                (COUNT(r.id) / NULLIF(EXTRACT(EPOCH FROM (MAX(r.dat_hora) - MIN(r.dat_hora))), 0)) AS readingFrequency, -- veículos por segundo
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Carro')        AS carCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Camionete')      AS camioneteCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Ônibus') AS onibusCount,
@@ -39,7 +40,7 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Moto')      AS motoCount,
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Indefinido')  AS indefinidoCount,
                 AVG(rd.carros_min_med) AS avgCarsPerMinute,
-                MAX(rd.carros_min_max) AS maxCarsPerMinute
+                AVG(rd.carros_min_max) AS maxCarsPerMinute
             """;
 
     private static final String QUERY_FROM_JOINS = """
@@ -220,15 +221,16 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
             BigDecimal avgSpeedLimit = toBigDecimal.apply(row[7]);
             Integer speedingCount = toInteger.apply(row[8]);
             BigDecimal averageSpeedingAmount = toBigDecimal.apply(row[9]);
-            Integer carCount = toInteger.apply(row[10]);
-            Integer camioneteCount = toInteger.apply(row[11]);
-            Integer onibusCount = toInteger.apply(row[12]);
-            Integer vanCount = toInteger.apply(row[13]);
-            Integer caminhaoGrandeCount = toInteger.apply(row[14]);
-            Integer motoCount = toInteger.apply(row[15]);
-            Integer indefinidoCount = toInteger.apply(row[16]);
-            BigDecimal avgCarsPerMinute = toBigDecimal.apply(row[17]);
-            BigDecimal maxCarsPerMinute = toBigDecimal.apply(row[18]);
+            BigDecimal readingFrequency = toBigDecimal.apply(row[10]);
+            Integer carCount = toInteger.apply(row[11]);
+            Integer camioneteCount = toInteger.apply(row[12]);
+            Integer onibusCount = toInteger.apply(row[13]);
+            Integer vanCount = toInteger.apply(row[14]);
+            Integer caminhaoGrandeCount = toInteger.apply(row[15]);
+            Integer motoCount = toInteger.apply(row[16]);
+            Integer indefinidoCount = toInteger.apply(row[17]);
+            BigDecimal avgCarsPerMinute = toBigDecimal.apply(row[18]);
+            BigDecimal maxCarsPerMinute = toBigDecimal.apply(row[19]);
 
             result.add(new ReadingGroupAggregate(
                     timeInterval,
@@ -243,6 +245,7 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                     averageSpeedingAmount,
                     avgCarsPerMinute,
                     maxCarsPerMinute,
+                    readingFrequency,
                     carCount,
                     camioneteCount,
                     onibusCount,
