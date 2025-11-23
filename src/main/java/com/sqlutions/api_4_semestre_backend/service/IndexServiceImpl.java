@@ -82,7 +82,8 @@ public class IndexServiceImpl implements IndexService {
                 aggregate.getTotalReadings() == 0 ||
                 aggregate.getStartTime() == null ||
                 aggregate.getEndTime() == null ||
-                aggregate.getAvgCarsPerMinute() == null) {
+                aggregate.getAvgCarsPerMinute() == null ||
+                aggregate.getMaxCarsPerMinute() == null) {
 
             return 1;
         }
@@ -96,18 +97,22 @@ public class IndexServiceImpl implements IndexService {
 
         double currentVolume = aggregate.getTotalReadings() / (seconds / 60.0);
 
-        double radarAvg = aggregate.getAvgCarsPerMinute().doubleValue();
+        double avg = aggregate.getAvgCarsPerMinute().doubleValue();
+        double max = aggregate.getMaxCarsPerMinute().doubleValue();
 
-        if (radarAvg <= 0)
+        if (avg <= 0 || max <= 0)
             return 1;
 
-        double ratio = currentVolume / radarAvg;
+        if (max < avg)
+            max = avg;
 
-        ratio = Math.min(ratio, 5);
+        double ratio = (currentVolume - avg) / (max - avg);
 
-        int index = (int) Math.ceil(ratio);
+        ratio = Math.max(0, Math.min(1, ratio));
 
-        return Math.max(1, Math.min(5, index));
+        int index = (int) Math.ceil(ratio * 4) + 1;
+
+        return index;
     }
 
     /**
