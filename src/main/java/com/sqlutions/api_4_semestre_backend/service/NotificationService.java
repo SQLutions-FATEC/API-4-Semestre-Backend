@@ -27,18 +27,21 @@ public class NotificationService {
         this.timeService = timeService;
     }
 
-    public void sendAlert(String messageText, String indexType, Integer indexValue) {
+    
+    public void sendAlert(String reportText, String indexType, Integer indexValue) {
 
         NotificationLog log = new NotificationLog(
-                messageText,
-                chatId,
-                false,
-                null,
-                indexType,
-                indexValue
+                reportText,                    
+                "Notificação Automática",      
+                indexType,                     
+                indexValue,                    
+                null,                         
+                null,                          
+                false,                        
+                null                           
         );
 
-        log.setStartAt(timeService.getCurrentTimeClampedToDatabase());
+        log.setStartedAt(timeService.getCurrentTimeClampedToDatabase());
 
         System.out.println("Enviando notificação...");
 
@@ -47,7 +50,7 @@ public class NotificationService {
 
             String json = String.format(
                     "{\"chat_id\": \"%s\", \"text\": \"%s\", \"parse_mode\": \"Markdown\"}",
-                    chatId, messageText
+                    chatId, reportText
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -59,7 +62,9 @@ public class NotificationService {
             log.setSuccess(true);
 
             System.out.println("✅ Notificação enviada com sucesso");
+
         } catch (Exception e) {
+
             log.setErrorDetails(e.getMessage());
             log.setSuccess(false);
 
@@ -69,8 +74,8 @@ public class NotificationService {
         log.setCompletedAt(timeService.getCurrentTimeClampedToDatabase());
         logRepository.save(log);
 
-        System.out.println("Log salvo no banco de dados");
-        System.out.println("Iniciado em: " + log.getStartAt());
+        System.out.println("📄 Log salvo no banco");
+        System.out.println("Iniciado em: " + log.getStartedAt());
         System.out.println("Finalizado em: " + log.getCompletedAt());
     }
 }
