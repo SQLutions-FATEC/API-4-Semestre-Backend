@@ -1,127 +1,103 @@
 package com.sqlutions.api_4_semestre_backend.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "notification_logs")
+@Table(name = "log_notificacao")
 public class NotificationLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; 
-
-    @Column(columnDefinition = "TEXT")
-    private String reportText; // descrição
-
-    private String title; // título do log
-
-    private String indexType; // tipo do índice (Segurança, Trafego ou Volume)
-
-    private Integer indexValue; // valor do índice (1-5)
-
-    private LocalDateTime startedAt; 
-
-    private LocalDateTime completedAt; 
-
-    private boolean success; 
-
-    @Column(columnDefinition = "TEXT")
-    private String errorDetails; 
+    private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private User user;
+    
+    @Column(name = "mensagem", columnDefinition = "TEXT", nullable = false)
+    private String messageText;
+    
+    @Column(name = "texto_relatorio", columnDefinition = "TEXT")
+    private String reportText;
+    
+    @Column(name = "data_emissao")
+    private LocalDateTime emissionDate;
+    
+    @Column(name = "data_conclusao")
+    private LocalDateTime completionDate;
 
     public NotificationLog() {}
 
-    public NotificationLog(
-            String reportText,
-            String title,
-            String indexType,
-            Integer indexValue,
-            LocalDateTime startedAt,
-            LocalDateTime completedAt,
-            boolean success,
-            String errorDetails
-    ) {
-        this.reportText = reportText; 
-        this.title = title;
-        this.indexType = indexType;
-        this.indexValue = indexValue;
-        this.startedAt = startedAt;
-        this.completedAt = completedAt;
-        this.success = success;
-        this.errorDetails = errorDetails;
+    public NotificationLog(String mensagem, String textoRelatorio, String tipoIndice,
+                       Integer valorIndice, LocalDateTime dataInicio,
+                       LocalDateTime dataConclusao, boolean status, User usuario) {
+        this.mensagem = mensagem;
+        this.textoRelatorio = textoRelatorio;
+        this.tipoIndice = tipoIndice;
+        this.valorIndice = valorIndice;
+        this.startedAt = dataInicio;
+        this.completedAt = dataConclusao;
+        this.status = status;
+        this.usuario = usuario;
     }
 
+
+    // Getters and Setters
     public Long getId() {
-        return id; 
+        return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getMessage() {
+        return messageText;
+    }
+
+    public void setMessage(String messageText) {
+        this.messageText = messageText;
     }
 
     public String getReportText() {
-        return reportText; 
+        return reportText;
     }
 
     public void setReportText(String reportText) {
         this.reportText = reportText;
     }
 
-    public String getTitle() {
-        return title; 
+    public LocalDateTime getEmissionDate() {
+        return emissionDate;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setEmissionDate(LocalDateTime emissionDate) {
+        this.emissionDate = emissionDate;
     }
 
-    public String getIndexType() {
-        return indexType; 
+    public LocalDateTime getCompletionDate() {
+        return completionDate;
     }
 
-    public void setIndexType(String indexType) {
-        this.indexType = indexType;
+    public void setCompletionDate(LocalDateTime completionDate) {
+        this.completionDate = completionDate;
     }
 
-    public Integer getIndexValue() {
-        return indexValue; 
-    }
-
-    public void setIndexValue(Integer indexValue) {
-        this.indexValue = indexValue;
-    }
-
-    public LocalDateTime getStartedAt() {
-        return startedAt; 
-    }
-
-    public void setStartedAt(LocalDateTime startedAt) {
-        this.startedAt = startedAt;
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt; 
-    }
-
-    public void setCompletedAt(LocalDateTime completedAt) {
-        this.completedAt = completedAt;
-    }
-
-    public boolean isSuccess() {
-        return success; 
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getErrorDetails() {
-        return errorDetails; 
-    }
-
-    public void setErrorDetails(String errorDetails) {
-        this.errorDetails = errorDetails;
-    }
 }
