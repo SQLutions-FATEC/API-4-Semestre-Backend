@@ -31,15 +31,10 @@ public class NotificationService {
     public void sendAlert(String reportText, String indexType, Integer indexValue) {
 
         NotificationLog log = new NotificationLog(
-                reportText,                    
-                "Notificação Automática",      
-                indexType,                     
-                indexValue,                    
-                null,                         
-                null,                          
-                false,                        
-                null                           
+            reportText,
+            "Notificação Automática"
         );
+
 
         log.setEmissionDate(timeService.getCurrentTimeClampedToDatabase());
 

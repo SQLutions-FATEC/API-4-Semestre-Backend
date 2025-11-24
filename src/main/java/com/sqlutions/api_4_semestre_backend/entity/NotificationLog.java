@@ -41,18 +41,19 @@ public class NotificationLog {
 
     public NotificationLog() {}
 
-    public NotificationLog(String mensagem, String textoRelatorio, String tipoIndice,
-                       Integer valorIndice, LocalDateTime dataInicio,
-                       LocalDateTime dataConclusao, boolean status, User usuario) {
-        this.mensagem = mensagem;
-        this.textoRelatorio = textoRelatorio;
-        this.tipoIndice = tipoIndice;
-        this.valorIndice = valorIndice;
-        this.startedAt = dataInicio;
-        this.completedAt = dataConclusao;
-        this.status = status;
-        this.usuario = usuario;
+    public NotificationLog(String reportText, String messageText) {
+        this.reportText = reportText;
+        this.messageText = messageText;
     }
+    
+    public NotificationLog(User user, String messageText, String reportText, LocalDateTime emissionDate, LocalDateTime completionDate) {
+        this.user = user;
+        this.messageText = messageText;
+        this.reportText = reportText;
+        this.emissionDate = emissionDate;
+        this.completionDate = completionDate;
+    }
+    
 
 
     // Getters and Setters
