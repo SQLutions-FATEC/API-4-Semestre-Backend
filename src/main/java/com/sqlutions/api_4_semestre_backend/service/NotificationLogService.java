@@ -37,7 +37,6 @@ public class NotificationLogService {
         NotificationLog existingLog = repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Log not found with id: " + id));
 
-        existingLog.setTitle(logDetails.getTitle());
         existingLog.setMessage(logDetails.getMessage());
         existingLog.setReportText(logDetails.getReportText());
         existingLog.setCompletionDate(logDetails.getCompletionDate());

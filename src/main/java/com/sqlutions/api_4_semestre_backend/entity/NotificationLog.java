@@ -55,11 +55,11 @@ public class NotificationLog {
     }
 
     public String getMessage() {
-        return message;
+        return messageText;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMessage(String messageText) {
+        this.messageText = messageText;
     }
 
     public String getReportText() {
@@ -84,14 +84,6 @@ public class NotificationLog {
 
     public void setCompletionDate(LocalDateTime completionDate) {
         this.completionDate = completionDate;
-    }
-
-    public Set<Region> getRegions() {
-        return regions;
-    }
-
-    public void setRegions(Set<Region> regions) {
-        this.regions = regions;
     }
 
 }

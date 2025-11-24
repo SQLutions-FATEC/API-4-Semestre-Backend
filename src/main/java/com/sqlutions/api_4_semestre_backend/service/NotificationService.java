@@ -41,7 +41,7 @@ public class NotificationService {
                 null                           
         );
 
-        log.setStartedAt(timeService.getCurrentTimeClampedToDatabase());
+        log.setEmissionDate(timeService.getCurrentTimeClampedToDatabase());
 
         System.out.println("Enviando notificação...");
 
@@ -59,19 +59,13 @@ public class NotificationService {
             HttpEntity<String> request = new HttpEntity<>(json, headers);
             new RestTemplate().postForObject(url, request, String.class);
 
-            log.setSuccess(true);
-
             System.out.println("✅ Notificação enviada com sucesso");
 
         } catch (Exception e) {
-
-            log.setErrorDetails(e.getMessage());
-            log.setSuccess(false);
-
             System.out.println("❌ Erro ao enviar notificação: " + e.getMessage());
         }
 
-        log.setCompletedAt(timeService.getCurrentTimeClampedToDatabase());
+        log.setCompletionDate(timeService.getCurrentTimeClampedToDatabase());
         logRepository.save(log);
 
         System.out.println("📄 Log salvo no banco");
