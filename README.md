@@ -12,24 +12,39 @@
 ## 🧱 Estrutura do Projeto
 
 ```text
-backend/
+API-4-Semestre-Backend/          
+├── .gitignore                  
+├── README.md
+├── pom.xml                      
 ├── deploy/
-│   └── init.sql              # Script de inicialização do banco de dados
+│   ├── backend/    
+│   ├── data/     
+│   ├── frontend/     
+│   ├── importer/  
+│   ├── postgres/  
+│   │    └── init.sql
+│   ├── importer/
+│   ├── docker-compose.yaml     
+│   └── .env.example                 
 ├── src/
 │   └── main/
-│       ├── java/com/sqlutions/altave/
-│       │   ├── config
-│       │   ├── controller
-│       │   ├── dto
-│       │   ├── entity
-│       │   ├── exception
-│       │   ├── repository
-│       │   ├── service/
-│       │   │   └── impl/
-│       │   └── Api4SemestreBackendApplication.java
+│       ├── java/
+│       │   └── com/
+│       │       └── sqlutions/
+│       │           └── altave/
+│       │               ├── Api4SemestreBackendApplication.java
+│       │               ├── config/       
+│       │               ├── controller/   
+│       │               ├── dto/          
+│       │               ├── entity/       
+│       │               ├── exception/    
+│       │               ├── repository/  
+│       │               └── service/      
+│       │                     
 │       └── resources/
-│           └── application.properties
-└── pom.xml
+│           └── application.properties    
+│               
+└── target/                               
 ```
 
 ---
