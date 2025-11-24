@@ -11,11 +11,6 @@ public class Index {
     public Index() {
     }
 
-    public Index(Integer trafficIndex, Integer securityIndex) {
-        this.trafficIndex = trafficIndex;
-        this.securityIndex = securityIndex;
-    }
-
     public LocalDateTime getStartTime() {
         return startTime;
     }
@@ -37,8 +32,7 @@ public class Index {
         this.trafficIndex = trafficIndex;
         this.startTime = startTime;
         this.endTime = endTime;
-    } 
-    
+    }
 
     public Integer getSecurityIndex() {
         return securityIndex;
