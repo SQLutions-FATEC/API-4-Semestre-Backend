@@ -1,7 +1,9 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
-import com.sqlutions.api_4_semestre_backend.entity.Address;
 import java.util.List;
+
+import com.sqlutions.api_4_semestre_backend.dto.AddressHeatMap;
+import com.sqlutions.api_4_semestre_backend.entity.Address;
 
 public interface AddressService {
 
@@ -14,4 +16,6 @@ public interface AddressService {
     Address updateAddress(Long id, Address address);
 
     void deleteAddress(Long id);
+
+    List<AddressHeatMap> listAddressHeatMapData(int minutes, java.time.LocalDateTime timestamp);
 }

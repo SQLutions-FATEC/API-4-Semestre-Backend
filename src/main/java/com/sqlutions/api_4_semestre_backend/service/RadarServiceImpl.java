@@ -64,6 +64,7 @@ public class RadarServiceImpl implements RadarService {
 
     @Override
     public Void deleteRadar(String id) {
+        getRadarById(id); // Verifica se o radar existe
         radarRepository.deleteById(id);
         return null;
     }

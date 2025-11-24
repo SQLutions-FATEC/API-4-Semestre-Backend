@@ -1,5 +1,6 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
+import com.sqlutions.api_4_semestre_backend.dto.LoginResponseDto;
 import com.sqlutions.api_4_semestre_backend.entity.User;
 import java.util.List;
 
@@ -15,6 +16,6 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    User login(String email, String password);
+    LoginResponseDto login(String email, String password);
 }
 

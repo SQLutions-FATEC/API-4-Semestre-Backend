@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim AS build
+FROM openjdk:17.0.2-jdk-slim AS build
 
 ARG REPO_URL
 ARG BACKEND_BRANCH
