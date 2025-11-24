@@ -30,6 +30,7 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                 MIN(r.vel) as minSpeed,
                 AVG(rd.vel_reg) as avgSpeedLimit,
                 COUNT(r.id) FILTER (WHERE r.vel > rd.vel_reg) AS speedingCount,
+                COUNT(DISTINCT r.id_rad) AS activeRadarCount,
                 AVG(CASE WHEN r.vel > rd.vel_reg THEN r.vel - rd.vel_reg ELSE 0 END) AS averageSpeedingAmount,
                 (COUNT(r.id) / NULLIF(EXTRACT(EPOCH FROM (MAX(r.dat_hora) - MIN(r.dat_hora))), 0)) AS readingFrequency, -- veículos por segundo
                 COUNT(r.id) FILTER (WHERE r.tip_vei = 'Carro')        AS carCount,
@@ -231,6 +232,7 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
             Integer indefinidoCount = toInteger.apply(row[17]);
             BigDecimal avgCarsPerMinute = toBigDecimal.apply(row[18]);
             BigDecimal maxCarsPerMinute = toBigDecimal.apply(row[19]);
+            Integer activeRadarCount = toInteger.apply(row[20]);
 
             result.add(new ReadingGroupAggregate(
                     timeInterval,
@@ -246,6 +248,7 @@ public class ReadingRepositoryAggregatesImpl implements ReadingRepositoryAggrega
                     avgCarsPerMinute,
                     maxCarsPerMinute,
                     readingFrequency,
+                    activeRadarCount,
                     carCount,
                     camioneteCount,
                     onibusCount,
