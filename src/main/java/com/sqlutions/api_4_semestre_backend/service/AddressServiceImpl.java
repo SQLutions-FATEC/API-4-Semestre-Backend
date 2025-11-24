@@ -1,18 +1,13 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sqlutions.api_4_semestre_backend.dto.AddressHeatMap;
 import com.sqlutions.api_4_semestre_backend.dto.ReadingGroupAggregate;
@@ -21,9 +16,6 @@ import com.sqlutions.api_4_semestre_backend.entity.Index;
 import com.sqlutions.api_4_semestre_backend.projections.AddressGeoData;
 import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
 import com.sqlutions.api_4_semestre_backend.repository.ReadingRepositoryAggregates;
-
-import com.sqlutions.api_4_semestre_backend.entity.Address;
-import com.sqlutions.api_4_semestre_backend.repository.AddressRepository;
 
 @Service
 public class AddressServiceImpl implements AddressService {

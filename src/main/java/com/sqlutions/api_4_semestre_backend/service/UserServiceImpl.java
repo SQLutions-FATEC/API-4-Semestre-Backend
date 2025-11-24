@@ -1,8 +1,12 @@
 package com.sqlutions.api_4_semestre_backend.service;
 
 import org.springframework.stereotype.Service;
-import com.sqlutions.api_4_semestre_backend.entity.Role;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import com.sqlutions.api_4_semestre_backend.config.JwtUtils;
+import com.sqlutions.api_4_semestre_backend.dto.LoginResponseDto;
 import com.sqlutions.api_4_semestre_backend.entity.User;
+import com.sqlutions.api_4_semestre_backend.exception.InvalidCredentialsException;
+import com.sqlutions.api_4_semestre_backend.exception.UserNotFoundException;
 import com.sqlutions.api_4_semestre_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,11 +18,18 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @Override
     public User saveUser(User user, User saveUser) {
-        if (user.getRole() == Role.Gestor && (saveUser == null || saveUser.getRole() != Role.Admin)) {
-            throw new RuntimeException("Somente administradores podem criar e gerenciar conta de gestores.");
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
+
         return userRepository.save(user);
     }
 
@@ -30,7 +41,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User searchIdUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
     }
 
     @Override
@@ -38,7 +49,11 @@ public class UserServiceImpl implements UserService {
         User user = searchIdUser(id);
         user.setName(updateUser.getName());
         user.setEmail(updateUser.getEmail());
-        user.setPassword(updateUser.getPassword());
+
+        if (updateUser.getPassword() != null && !updateUser.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
+        }
+
         user.setRole(updateUser.getRole());
         return userRepository.save(user);
     }
@@ -49,13 +64,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(String email, String password) {
+    public LoginResponseDto login(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Email não encontrado."));
-        if (!user.getPassword().equals(password)) {
-            throw new RuntimeException("Senha incorreta.");
+                .orElseThrow(() -> new InvalidCredentialsException("Email não encontrado."));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new InvalidCredentialsException("Senha incorreta.");
         }
-        return user;
+
+        String token = jwtUtils.generateJwtToken(user.getEmail(), user.getRole().name());
+
+        return new LoginResponseDto(token, user.getId(), user.getName(), user.getEmail(), user.getRole());
     }
 
 }

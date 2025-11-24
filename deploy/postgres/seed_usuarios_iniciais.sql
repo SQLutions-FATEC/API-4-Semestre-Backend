@@ -17,10 +17,8 @@
 -- senha  -> Senha dummy para preencher o campo
 
 INSERT INTO usuario (nome, nivel, email, senha) VALUES
-  ('Administrador', 'Admin', 'admin@sistema.com', 'senha_dummy'),  -- usuário com login
-  ('Gestor', 'Gestor', 'gestor@sistema.com', 'senha_dummy'),      -- usuário com login
-  ('Cidadão', 'Gestor', 'cidadao@sistema.com', 'senha_dummy');    -- usuário sem login
-
+  ('admin', 'Gestor', 'admin@sistema.com', '$2a$10$2.lQv/U.ouYG4T0Ek6naJey3GLsZZWit.Rz3pSN57SdTfIjV9XEYa');
+-- Senha inserida: "admin"
 
 -- ==========================
 -- Conferência (opcional)
