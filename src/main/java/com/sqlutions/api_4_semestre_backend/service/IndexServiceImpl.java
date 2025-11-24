@@ -84,7 +84,13 @@ public class IndexServiceImpl implements IndexService {
             return 1;
         }
 
-        double currentVolumePerMinute = aggregate.getReadingFrequency().doubleValue() * 60.0;
+        double totalVolumePerMinute = aggregate.getReadingFrequency().doubleValue() * 60.0;
+
+        int radarCount = (aggregate.getActiveRadarCount() == null || aggregate.getActiveRadarCount() == 0)
+                ? 1
+                : aggregate.getActiveRadarCount();
+
+        double currentVolumePerMinute = totalVolumePerMinute / radarCount;
 
         double avgHistory = aggregate.getAvgCarsPerMinute().doubleValue();
 
