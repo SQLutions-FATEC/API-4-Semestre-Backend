@@ -69,7 +69,7 @@ public class NotificationService {
         logRepository.save(log);
 
         System.out.println("📄 Log salvo no banco");
-        System.out.println("Iniciado em: " + log.getStartedAt());
-        System.out.println("Finalizado em: " + log.getCompletedAt());
+        System.out.println("Iniciado em: " + log.getEmissionDate());
+        System.out.println("Finalizado em: " + log.getCompletionDate());
     }
 }

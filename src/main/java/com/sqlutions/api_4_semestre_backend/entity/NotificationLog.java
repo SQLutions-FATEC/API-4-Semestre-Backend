@@ -41,6 +41,20 @@ public class NotificationLog {
 
     public NotificationLog() {}
 
+    public NotificationLog(String mensagem, String textoRelatorio, String tipoIndice,
+                       Integer valorIndice, LocalDateTime dataInicio,
+                       LocalDateTime dataConclusao, boolean status, User usuario) {
+        this.mensagem = mensagem;
+        this.textoRelatorio = textoRelatorio;
+        this.tipoIndice = tipoIndice;
+        this.valorIndice = valorIndice;
+        this.startedAt = dataInicio;
+        this.completedAt = dataConclusao;
+        this.status = status;
+        this.usuario = usuario;
+    }
+
+
     // Getters and Setters
     public Long getId() {
         return id;
