@@ -29,10 +29,12 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendAlert(String reportText, String indexType, Integer indexValue) {
 
-        NotificationLog log = new NotificationLog(
-            reportText,
-            "Notificação Automática"
-        );
+        NotificationLog log = new NotificationLog();
+
+        log.setReportText(reportText);
+        log.setMessageText("Notificação Automática");
+        log.setIndexType(indexType);
+        log.setIndexValue(indexValue);
 
         log.setEmissionDate(timeService.getCurrentTimeClampedToDatabase());
 
@@ -57,9 +59,11 @@ public class NotificationServiceImpl implements NotificationService {
             System.out.println("✅ Notificação enviada com sucesso");
 
         } catch (Exception e) {
-            System.out.println("❌ Erro ao enviar notificação: " + e.getMessageText());
+            System.out.println("❌ Erro ao enviar notificação: " + e.getMessage());
+            e.printStackTrace();
         }
 
+        // sempre salva no banco, mesmo se o Telegram falhar
         log.setCompletionDate(timeService.getCurrentTimeClampedToDatabase());
         logRepository.save(log);
 
