@@ -57,7 +57,7 @@ public class NotificationServiceImpl implements NotificationService {
             System.out.println("✅ Notificação enviada com sucesso");
 
         } catch (Exception e) {
-            System.out.println("❌ Erro ao enviar notificação: " + e.getMessage());
+            System.out.println("❌ Erro ao enviar notificação: " + e.getMessageText());
         }
 
         log.setCompletionDate(timeService.getCurrentTimeClampedToDatabase());
