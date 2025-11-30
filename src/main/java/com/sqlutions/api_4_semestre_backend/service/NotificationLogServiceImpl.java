@@ -32,7 +32,7 @@ public class NotificationLogServiceImpl implements NotificationLogService {
     @Override
     public NotificationLog createLog(NotificationLog log) {
 
-        if (log.getMessage() == null || log.getMessage().isBlank()) {
+        if (log.getMessageText() == null || log.getMessageText().isBlank()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Message must be provided");
@@ -58,8 +58,8 @@ public class NotificationLogServiceImpl implements NotificationLogService {
 
         NotificationLog existing = getLogById(log.getId());
 
-        if (log.getMessage() != null) {
-            existing.setMessage(log.getMessage());
+        if (log.getMessageText() != null) {
+            existing.setMessage(log.getMessageText());
         }
 
         if (log.getReportText() != null) {
