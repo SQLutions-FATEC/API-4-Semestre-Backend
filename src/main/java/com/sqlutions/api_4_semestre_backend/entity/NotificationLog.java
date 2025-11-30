@@ -45,7 +45,7 @@ public class NotificationLog {
         this.reportText = reportText;
         this.messageText = messageText;
     }
-    
+
     public NotificationLog(User user, String messageText, String reportText, LocalDateTime emissionDate, LocalDateTime completionDate) {
         this.user = user;
         this.messageText = messageText;
@@ -53,8 +53,6 @@ public class NotificationLog {
         this.emissionDate = emissionDate;
         this.completionDate = completionDate;
     }
-    
-
 
     // Getters and Setters
     public Long getId() {

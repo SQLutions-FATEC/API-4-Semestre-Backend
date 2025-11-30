@@ -7,4 +7,5 @@ import com.sqlutions.api_4_semestre_backend.entity.NotificationLog;
 
 @Repository
 public interface NotificationLogRepository extends JpaRepository<NotificationLog, Long> {
+    
 }

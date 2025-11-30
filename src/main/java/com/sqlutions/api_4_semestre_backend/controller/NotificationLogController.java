@@ -1,7 +1,10 @@
 package com.sqlutions.api_4_semestre_backend.controller;
 
+import java.net.URI;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,39 +18,60 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sqlutions.api_4_semestre_backend.entity.NotificationLog;
 import com.sqlutions.api_4_semestre_backend.service.NotificationLogService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
-@RequestMapping("/logs")
 @CrossOrigin
+@RequestMapping("/logs")
+@Tag(name = "Notification Log", description = "Endpoints for managing notification logs")
 public class NotificationLogController {
 
-    private final NotificationLogService service;
-
-    public NotificationLogController(NotificationLogService service) {
-        this.service = service;
-    }
+    @Autowired
+    private NotificationLogService service;
 
     @GetMapping
-    public List<NotificationLog> getAllLogs() {
-        return service.findAll();
+    @Operation(summary = "Get all notification logs")
+    @ApiResponse(responseCode = "200", description = "Logs retrieved successfully")
+    public ResponseEntity<List<NotificationLog>> getAllLogs() {
+        return ResponseEntity.ok(service.getAllLogs());
     }
 
     @GetMapping("/{id}")
-    public NotificationLog getLogById(@PathVariable Long id) {
-        return service.findById(id).orElse(null);
+    @Operation(summary = "Get notification log by ID")
+    @ApiResponse(responseCode = "200", description = "Log retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "Log not found")
+    public ResponseEntity<NotificationLog> getLogById(@PathVariable Long id) {
+        NotificationLog log = service.getLogById(id); // já lança 404 no service
+        return ResponseEntity.ok(log);
     }
 
     @PostMapping
-    public NotificationLog createLog(@RequestBody NotificationLog log) {
-        return service.save(log);
+    @Operation(summary = "Create a new notification log")
+    @ApiResponse(responseCode = "201", description = "Log created successfully")
+    public ResponseEntity<NotificationLog> createLog(@RequestBody NotificationLog log) {
+        NotificationLog saved = service.createLog(log);
+        return ResponseEntity
+                .created(URI.create("/logs/" + saved.getId()))
+                .body(saved);
+    }
+
+    @PutMapping
+    @Operation(summary = "Update an existing notification log")
+    @ApiResponse(responseCode = "200", description = "Log updated successfully")
+    @ApiResponse(responseCode = "404", description = "Log not found")
+    public ResponseEntity<NotificationLog> updateLog(@RequestBody NotificationLog log) {
+        NotificationLog updated = service.updateLog(log);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLog(@PathVariable Long id) {
-        service.delete(id);
-    }
-
-    @PutMapping("/{id}")
-    public NotificationLog updateLog(@PathVariable Long id, @RequestBody NotificationLog log) {
-        return service.update(id, log);
+    @Operation(summary = "Delete a notification log")
+    @ApiResponse(responseCode = "202", description = "Log deletion accepted")
+    @ApiResponse(responseCode = "404", description = "Log not found")
+    public ResponseEntity<Void> deleteLog(@PathVariable Long id) {
+        return ResponseEntity.accepted()
+                .body(service.deleteLog(id));
     }
 }
