@@ -57,6 +57,20 @@ public class NotificationLogController {
                 .body(saved);
     }
 
+    @PostMapping("/test")
+    @Operation(summary = "Create a dummy test notification log")
+    @ApiResponse(responseCode = "201", description = "Test log created successfully")
+    public ResponseEntity<NotificationLog> createTestLog() {
+
+        NotificationLog saved = service.createTestLog();
+
+        return ResponseEntity
+                .created(URI.create("/logs/" + saved.getId()))
+                .body(saved);
+    }
+
+
+
     @PutMapping
     @Operation(summary = "Update an existing notification log")
     @ApiResponse(responseCode = "200", description = "Log updated successfully")

@@ -48,6 +48,37 @@ public class NotificationLogServiceImpl implements NotificationLogService {
     }
 
     @Override
+    public NotificationLog createTestLog() {
+
+        NotificationLog log = new NotificationLog();
+
+        Random random = new Random();
+
+        boolean typeSelector = random.nextBoolean();
+        String indexType = typeSelector ? "TRANSITO" : "SEGURANCA";
+        log.setIndexType(indexType);
+
+        int indexValue = random.nextBoolean() ? 4 : 5;
+        log.setIndexValue(indexValue);
+
+        // Gera mensagem automaticamente (exemplo)
+        String message = "Notificação de teste criada para " 
+                    + randomType.name() 
+                    + " com valor " 
+                    + randomIndexValue;
+
+        log.setMessageText(message);
+
+        // Deixa reportText e completionDate nulos (vai ser preenchido depois no modal)
+        log.setReportText(null);
+        log.setCompletionDate(null);
+
+        return repository.save(log);
+    }
+
+
+
+    @Override
     public NotificationLog updateLog(NotificationLog log) {
 
         if (log.getId() == null) {

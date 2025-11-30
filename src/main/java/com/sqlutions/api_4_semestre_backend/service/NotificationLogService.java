@@ -12,6 +12,8 @@ public interface NotificationLogService {
 
     NotificationLog createLog(NotificationLog log);
 
+    NotificationLog createTestLog();
+
     NotificationLog updateLog(NotificationLog log);
 
     Void deleteLog(Long id);
