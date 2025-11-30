@@ -59,7 +59,7 @@ public class NotificationLogServiceImpl implements NotificationLogService {
         NotificationLog existing = getLogById(log.getId());
 
         if (log.getMessageText() != null) {
-            existing.setMessage(log.getMessageText());
+            existing.setMessageText(log.getMessageText());
         }
 
         if (log.getReportText() != null) {
