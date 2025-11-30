@@ -74,11 +74,11 @@ public class NotificationLog {
         this.user = user;
     }
 
-    public String getMessage() {
+    public String getMessageText() {
         return messageText;
     }
 
-    public void setMessage(String messageText) {
+    public void setMessageText(String messageText) {
         this.messageText = messageText;
     }
 
