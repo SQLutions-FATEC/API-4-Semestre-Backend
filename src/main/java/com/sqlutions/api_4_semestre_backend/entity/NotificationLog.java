@@ -22,24 +22,31 @@ public class NotificationLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "id_usuario")
     private User user;
-    
+
     @Column(name = "mensagem", columnDefinition = "TEXT", nullable = false)
     private String messageText;
-    
+
     @Column(name = "texto_relatorio", columnDefinition = "TEXT")
     private String reportText;
-    
+
+    @Column(name = "tipo_indice", nullable = false)
+    private String indexType;
+
+    @Column(name = "valor_indice", nullable = false)
+    private Integer indexValue;
+
     @Column(name = "data_emissao")
     private LocalDateTime emissionDate;
-    
+
     @Column(name = "data_conclusao")
     private LocalDateTime completionDate;
 
-    public NotificationLog() {}
+    public NotificationLog() {
+    }
 
     public NotificationLog(String reportText, String messageText) {
         this.reportText = reportText;
