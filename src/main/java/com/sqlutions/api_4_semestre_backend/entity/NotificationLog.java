@@ -90,6 +90,23 @@ public class NotificationLog {
         this.reportText = reportText;
     }
 
+    public String getIndexType() {
+    return indexType;
+}
+
+    public void setIndexType(String indexType) {
+        this.indexType = indexType;
+    }
+
+    public Integer getIndexValue() {
+        return indexValue;
+    }
+
+    public void setIndexValue(Integer indexValue) {
+        this.indexValue = indexValue;
+    }
+
+
     public LocalDateTime getEmissionDate() {
         return emissionDate;
     }
