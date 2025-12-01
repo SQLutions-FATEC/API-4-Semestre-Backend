@@ -24,7 +24,7 @@ public class NotificationLog {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario")
+    @JoinColumn(name = "id_usuario", nullable = true)
     private User user;
 
     @Column(name = "mensagem", columnDefinition = "TEXT", nullable = false)
