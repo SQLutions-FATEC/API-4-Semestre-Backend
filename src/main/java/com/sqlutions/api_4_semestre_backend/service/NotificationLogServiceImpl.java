@@ -39,12 +39,6 @@ public class NotificationLogServiceImpl implements NotificationLogService {
                     "Message must be provided");
         }
 
-        if (log.getReportText() == null || log.getReportText().isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Report text must be provided");
-        }
-
         return repository.save(log);
     }
 
