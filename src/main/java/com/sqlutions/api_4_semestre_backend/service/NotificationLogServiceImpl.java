@@ -61,17 +61,15 @@ public class NotificationLogServiceImpl implements NotificationLogService {
 
         int indexValue = random.nextBoolean() ? 4 : 5;
 
-        String message =
-                indexType.equals("Transito")
-                ? "Movimento intenso detectado na via principal"
-                : "Nivel de risco elevado identificado na regiao";
+        String message = "Notificação de teste criada para " 
+                    + randomType.name() 
+                    + " com valor " 
+                    + randomIndexValue;
 
-        NotificationLog log = new NotificationLog();
-
-        log.setIndexType(indexType);
-        log.setIndexValue(indexValue);
         log.setMessageText(message);
-        log.setEmissionDate(timeService.getCurrentTimeClampedToDatabase());
+
+        log.setReportText(null);
+        log.setCompletionDate(null);
 
         return repository.save(log);
     }
