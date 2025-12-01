@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Random;
 
 import com.sqlutions.api_4_semestre_backend.entity.NotificationLog;
 import com.sqlutions.api_4_semestre_backend.repository.NotificationLogRepository;
@@ -54,24 +55,23 @@ public class NotificationLogServiceImpl implements NotificationLogService {
 
         Random random = new Random();
 
-        boolean typeSelector = random.nextBoolean();
-        String indexType = typeSelector ? "TRANSITO" : "SEGURANCA";
-        log.setIndexType(indexType);
+        boolean type = random.nextBoolean();
+
+        String indexType = type ? "Transito" : "Seguranca";
 
         int indexValue = random.nextBoolean() ? 4 : 5;
+
+        String message =
+                indexType.equals("Transito")
+                ? "Movimento intenso detectado na via principal"
+                : "Nivel de risco elevado identificado na regiao";
+
+        NotificationLog log = new NotificationLog();
+
+        log.setIndexType(indexType);
         log.setIndexValue(indexValue);
-
-        // Gera mensagem automaticamente (exemplo)
-        String message = "Notificação de teste criada para " 
-                    + randomType.name() 
-                    + " com valor " 
-                    + randomIndexValue;
-
         log.setMessageText(message);
-
-        // Deixa reportText e completionDate nulos (vai ser preenchido depois no modal)
-        log.setReportText(null);
-        log.setCompletionDate(null);
+        log.setEmissionDate(timeService.getCurrentTimeClampedToDatabase());
 
         return repository.save(log);
     }
