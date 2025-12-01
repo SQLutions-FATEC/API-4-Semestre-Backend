@@ -55,17 +55,19 @@ public class NotificationLogServiceImpl implements NotificationLogService {
 
         Random random = new Random();
 
-        boolean type = random.nextBoolean();
+        boolean isTransit = random.nextBoolean();
 
-        String indexType = type ? "Transito" : "Seguranca";
+        String indexType = isTransit ? "Transito" : "Seguranca";
 
         int indexValue = random.nextBoolean() ? 4 : 5;
 
-        String message = "Notificação de teste criada para " 
-                    + randomType.name() 
-                    + " com valor " 
-                    + randomIndexValue;
+        String message = "Notificação de teste criada para "
+                + indexType
+                + " com valor "
+                + indexValue;
 
+        log.setIndexType(indexType);
+        log.setIndexValue(indexValue);
         log.setMessageText(message);
 
         log.setReportText(null);
@@ -73,8 +75,6 @@ public class NotificationLogServiceImpl implements NotificationLogService {
 
         return repository.save(log);
     }
-
-
 
     @Override
     public NotificationLog updateLog(NotificationLog log) {
